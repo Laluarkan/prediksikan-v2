@@ -41,70 +41,94 @@
 /* ====== Tata Letak Riwayat Prediksi ====== */
 #history-list {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-auto-rows: auto;
+  /* Grid 5 kolom di layar besar, menyesuaikan ke bawah di layar kecil */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
   gap: 12px;
   margin-top: 12px;
-  margin: 20px;
+  margin-bottom: 20px; /* Jarak sebelum tombol */
 }
 
 .history h2 {
-  margin: 10px;
-  color: white;
+    margin-bottom: 15px; /* Jarak judul */
+    color: white;
+    text-align: center; /* Judul di tengah */
 }
 
-.history {
-  margin: 20px;
-}
-
-.hist-item {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease, background 0.2s ease;
-  overflow: hidden;
+/* Style item riwayat (sekarang jadi link <a>) */
+.hist-item { /* Ganti nama class jika perlu, atau gunakan .hist-item-link seperti di history.css */
+    display: block; /* Agar link mengisi area */
+    text-decoration: none; /* Hapus garis bawah link */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 10px 12px; /* Sesuaikan padding */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, background 0.2s ease;
+    overflow: hidden;
+    color: #e2e8f0; /* Warna teks default */
 }
 
 .hist-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
 }
 
-.hist-item strong {
-  display: block;
-  color: var(--accent);
-  font-size: 0.95rem;
-  margin-bottom: 4px;
+.hist-item strong { /* Liga */
+    display: block;
+    color: var(--accent);
+    font-size: 0.9rem; /* Sedikit kecil */
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Handle nama liga panjang */
+}
+.hist-item small { /* Waktu */
+    color: var(--muted);
+    font-size: 0.75rem; /* Lebih kecil */
+}
+.hist-item span { /* Nama tim & hasil */
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem; /* Lebih kecil */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.hist-match { /* Nama tim */
+     font-weight: 500;
+}
+.hist-preds { /* Hasil prediksi */
+     color: var(--muted);
 }
 
-.hist-item small {
-  color: var(--muted);
-  font-size: 0.8rem;
-}
 
-.hist-item span {
-  display: block;
-  margin-top: 4px;
-  color: #d1e7f5;
-  font-size: 0.85rem;
-}
-
+/* Tombol-tombol di bawah riwayat */
 .history-actions {
-  text-align: right;
+    text-align: center; /* Tombol di tengah */
+    margin-top: 15px;
 }
 
-.history-actions .btn.small {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  transition: 0.2s;
+/* Tombol Lihat Semua Riwayat (Contoh style, sesuaikan) */
+.view-all-history {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    margin-right: 10px; /* Jarak dari tombol Hapus */
+}
+.view-all-history:hover {
+    background: var(--accent);
+    color: #052025; /* Teks gelap saat hover */
 }
 
-.history-actions .btn.small:hover {
-  background: var(--accent);
-  color: #052025;
+/* Tombol bersihkan riwayat (style tidak berubah) */
+#clear-history.btn.small {
+    background: transparent;
+    border: 1px solid #ef4444; /* Warna merah */
+    color: #ef4444; /* Warna merah */
+}
+#clear-history.btn.small:hover {
+    background: #ef4444;
+    color: #fff; /* Teks putih saat hover */
 }
 
 

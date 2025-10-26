@@ -1,0 +1,66 @@
+{% load static %}
+{% load i18n %} {# Tag Django untuk terjemahan (opsional) #}
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In Via Google | Prediksi-Kan</title> {# Judul sedikit berbeda #}
+    
+    <link rel="icon" type="image/png" href="{% static 'images/prediksikan-logo.png' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    
+    <style>
+        .btn-continue {
+            display: inline-block;
+            background-color: var(--accent, #06b6d4); /* Warna aksen tema Anda */
+            color: var(--card, #111827); /* Warna teks gelap */
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: none; /* Hapus border */
+            cursor: pointer; /* Tunjukkan bisa diklik */
+            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s ease;
+            margin-top: 1rem; /* Jarak dari teks */
+        }
+
+        .btn-continue:hover {
+            background-color: #0891b2; /* Warna aksen lebih gelap */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        .btn-continue:active {
+             transform: translateY(0);
+             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .login-box p { /* Style untuk teks paragraf */
+            color: var(--muted, #9ca3af);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body class="login-page"> {# Gunakan class yang sama dengan login.css #}
+    <div class="login-box"> {# Gunakan class yang sama #}
+        
+        {# Judul halaman (sedikit berbeda dari allauth default) #}
+        <h2>Konfirmasi Login Google</h2> 
+
+        {# Pesan dari allauth #}
+        <p>{% blocktranslate %}Anda akan masuk menggunakan akun pihak ketiga dari Google.{% endblocktranslate %}</p>
+
+        {# Form allauth dengan tombol Continue #}
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn-continue" type="submit">{% trans "Continue" %}</button>
+        </form>
+
+        {# Link Kembali ke Home #}
+        <a class="back-link" href="{% url 'home' %}" style="margin-top: 1.5rem;">Kembali ke Home</a> {# Tambah margin atas #}
+    </div>
+</body>
+</html>

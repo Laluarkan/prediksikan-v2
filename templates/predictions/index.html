@@ -4,6 +4,68 @@
 {% block page_styles %}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
   <link rel="stylesheet" href="{% static 'css/index.css' %}">
+  {# ▼▼▼ Style untuk AI explanation ▼▼▼ #}
+  <style>
+      #ai-explanation-container {
+          margin-top: 25px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      #ai-explanation {
+          font-size: 0.95rem;
+          color: var(--muted); /* Warna abu-abu */
+          line-height: 1.6;
+          font-style: italic; /* Miring */
+          background-color: rgba(0,0,0,0.1); /* Latar sedikit beda */
+          padding: 12px 15px;
+          border-radius: 6px;
+          border-left: 3px solid var(--accent); /* Aksen di kiri */
+      }
+      #ai-explanation::before {
+          content: "🤖 Analisis AI: "; /* Tambah label */
+          font-style: normal; /* Label tidak miring */
+          font-weight: 600; /* Label tebal */
+          color: #cbd5e1; /* Warna label lebih terang */
+      }
+
+      /* === SPINNER LOADING ANIMASI ELEGAN === */
+#loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    padding: 25px 0;
+}
+
+.spinner {
+    width: 42px;
+    height: 42px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--accent, #06b6d4);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+#loading-spinner p {
+    color: #e5e7eb;
+    font-size: 0.95rem;
+    letter-spacing: 0.4px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Agar efek muncul halus */
+.hidden {
+    display: none !important;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+  </style>
+  {# ▲▲▲ Akhir Style AI ▲▲▲ #}
 {% endblock %}
 
 
@@ -112,7 +174,13 @@
     </div>
 
     <div id="result" class="hidden">
-        </div>
+        {# ▼▼▼ TAMBAHKAN KONTENER & ELEMEN PENJELASAN AI ▼▼▼ #}
+       <div id="prediction-content">
+           </div>
+       <div id="ai-explanation-container" class="hidden"> {# Awalnya disembunyikan #}
+           <div id="ai-explanation">Memuat penjelasan AI...</div>
+       </div>
+    </div>
 </div> 
 
 <footer class="main-footer">
@@ -135,6 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const predictBtn = document.getElementById('PredictBtn');
     const resultEl = document.getElementById('result');
     const loadingSpinner = document.getElementById('loading-spinner');
+    
+    // ▼▼▼ TAMBAHKAN DEKLARASI INI ▼▼▼
+    const predictionContentEl = document.getElementById('prediction-content'); 
+    const aiExplanationContainer = document.getElementById('ai-explanation-container'); 
+    const aiExplanationEl = document.getElementById('ai-explanation'); 
+    // ▲▲▲ AKHIR TAMBAHAN ▲▲▲
 
     let currentFeatures = null;
 
@@ -302,27 +376,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================== TAMPILKAN HASIL =====================
     function showPredictionResult(json) {
+        if (predictionContentEl) predictionContentEl.innerHTML = ''; 
+        if (aiExplanationContainer) aiExplanationContainer.classList.add('hidden'); 
+        if (aiExplanationEl) aiExplanationEl.textContent = 'Memuat penjelasan AI...'; 
+
+        if (resultEl) resultEl.classList.remove('hidden'); 
+
         if (!json || json.status !== 'ok' || !json.prediction) {
-            resultEl.classList.remove('hidden');
-            resultEl.innerHTML = `<div>❌ Gagal menampilkan hasil prediksi: ${json.message || ''}</div>`;
-            return;
+             if (predictionContentEl) predictionContentEl.innerHTML = `<div style="color: red; text-align: center;">❌ Gagal menampilkan hasil prediksi: ${json.message || 'Error tidak diketahui'}</div>`;
+            return; 
         }
+
         const p = json.prediction;
-        resultEl.classList.remove('hidden');
-        resultEl.innerHTML = `
-          <div class="result-title">📊 Hasil Prediksi</div>
-          <div id="main-result" style="text-align:center; margin-bottom: 20px;">
-            🏠 (Home/Draw/Away): <b>${p.HDA?.label || '-'}</b><br>
-            ⚽ Over/Under 2.5: <b>${p.OU25?.label || '-'}</b><br>
-            🤝 BTTS: <b>${p.BTTS?.label || '-'}</b>
-          </div>
-          <div id="prob-bars" class="prob-section">
-            ${renderProbBlock('🏠 (Home / Draw / Away)', p.HDA?.probs)}
-            ${renderProbBlock('⚽ Over / Under 2.5', p.OU25?.probs)}
-            ${renderProbBlock('🤝 Both Team To Score', p.BTTS?.probs)}
-          </div>
+        const mainResultHTML = `
+            <div class="result-title">📊 Hasil Prediksi</div>
+            <div id="main-result" style="text-align:center; margin-bottom: 20px;">
+              🏠 (H/D/A): <b>${p.HDA?.label || '-'}</b><br>
+              ⚽ (O/U 2.5): <b>${p.OU25?.label || '-'}</b><br>
+              🤝 (BTTS): <b>${p.BTTS?.label || '-'}</b>
+            </div>
+            <div id="prob-bars" class="prob-section">
+              ${renderProbBlock('🏠 (Home / Draw / Away)', p.HDA?.probs)}
+              ${renderProbBlock('⚽ Over / Under 2.5', p.OU25?.probs)}
+              ${renderProbBlock('🤝 Both Team To Score', p.BTTS?.probs)}
+            </div>
         `;
-        animateBars();
+        
+        if (predictionContentEl) predictionContentEl.innerHTML = mainResultHTML; 
+        animateBars(); 
+
+        // Tampilkan Penjelasan AI 
+        if (json.explanation && aiExplanationEl && aiExplanationContainer) {
+            aiExplanationEl.textContent = json.explanation; 
+            aiExplanationContainer.classList.remove('hidden'); 
+        } else if(aiExplanationEl && aiExplanationContainer) {
+             aiExplanationEl.textContent = 'Penjelasan AI tidak tersedia.'; 
+             aiExplanationContainer.classList.remove('hidden'); 
+        }
     }
     
     function getGradientColor(percent) {
@@ -421,41 +511,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================== PREDICT BUTTON =====================
     predictBtn.addEventListener('click', async () => {
+        console.log('Tombol Prediksi diklik');
+
+        // Simpan teks asli tombol
+        const originalText = predictBtn.innerHTML;
         predictBtn.disabled = true;
-        if (loadingSpinner) loadingSpinner.classList.remove('hidden'); // <-- Tampilkan spinner
+        predictBtn.innerHTML = 'Memproses...';
+
         resultEl.classList.add('hidden');
+        if (predictionContentEl) predictionContentEl.innerHTML = '';
 
         try {
             const features = getFeaturesForPrediction();
-            
             const res = await fetch('/api/predict', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify({
                     league: leagueChoice.getValue(true),
-                    features: features,
+                    features,
                     home_team: homeChoice.getValue(true),
                     away_team: awayChoice.getValue(true)
                 })
             });
 
             const json = await res.json();
-            showPredictionResult(json); // Tampilkan hasil baru
+            showPredictionResult(json);
         } catch (err) {
+            console.error('Error prediksi:', err);
             alert('Terjadi kesalahan saat prediksi: ' + err.message);
-            console.error(err);
-            // ▼▼▼ 2. Tampilkan pesan error jika GAGAL (opsional tapi bagus) ▼▼▼
-            resultEl.classList.remove('hidden'); // Tampilkan area hasil
-            resultEl.innerHTML = `<div style="color: red; text-align: center;">❌ Terjadi kesalahan: ${err.message}</div>`; // Isi dengan pesan error
-            // ▲▲▲ AKHIR PERUBAHAN 2 ▲▲▲
         } finally {
-            // ▼▼▼ 3. Aktifkan tombol & SEMBUNYIKAN SPINNER (selalu dijalankan) ▼▼▼
             predictBtn.disabled = false;
-            if (loadingSpinner) loadingSpinner.classList.add('hidden'); // <-- Sembunyikan spinner lagi
-            // ▲▲▲ AKHIR PERUBAHAN 3 ▲▲▲
+            predictBtn.innerHTML = originalText;
+            console.log('Prediksi selesai, tombol dikembalikan.');
         }
     });
 

@@ -11,4 +11,5 @@ urlpatterns = [
     
     # Arahkan semua URL aplikasi Anda ke predictions.urls
     path('', include('predictions.urls')),
+    path('', include('pwa.urls')),
 ]

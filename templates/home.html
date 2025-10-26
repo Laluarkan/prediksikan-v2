@@ -4,6 +4,12 @@
 
 {% block page_styles %}
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="manifest" href="{% static 'manifest.json' %}"> 
+    {# Catatan: Django-PWA membuat manifest.json secara otomatis di root URL /manifest.json #}
+    {# Namun, tag ini sering membantu browser dalam menemukannya. #}
+    {# Alternatif: <link rel="manifest" href="/manifest.json"> #}
+    {# URL yang benar di Django-PWA adalah '/manifest.json' #}
+    <link rel="manifest" href="/manifest.json">
 {% endblock %}
 
 
@@ -42,22 +48,27 @@
   
   {% if user.is_authenticated %}
   <section class="history">
-    <h2>Riwayat Prediksi</h2>
+    <h2>Riwayat Prediksi Terbaru (5)</h2> 
     <div id="history-list">(Memuat riwayat...)</div>
     <div class="history-actions">
+      <a href="{% url 'history_list' %}" class="btn small view-all-history">Lihat Semua Riwayat</a> 
       <button id="clear-history" class="btn small">Bersihkan Riwayat</button>
     </div>
   </section>
   {% endif %}
 
   <section class="about">
-      <h2>Tentang Aplikasi Prediksi-Kan</h2>
-        <p>
-        <strong>Prediksi-Kan</strong> adalah aplikasi web yang membantu kamu memprediksi hasil pertandingan sepak bola
-        menggunakan model machine learning. Dirancang agar mudah digunakan, hasil analisis ditampilkan secara interaktif
-        dengan antarmuka yang bersih dan ringan.
-      </p>
-  </section>
+  <h2>Tentang Aplikasi <strong>Prediksi-Kan</strong></h2>
+  <p>
+    <strong>Prediksi-Kan</strong> adalah aplikasi web cerdas yang dirancang untuk memprediksi hasil pertandingan sepak bola secara akurat menggunakan teknologi <strong>Machine Learning</strong> dan <strong>Google Gemini AI</strong>.  
+    Aplikasi ini memanfaatkan data historis dan analisis statistik mendalam untuk memberikan prediksi yang lebih realistis dan informatif kepada pengguna.  
+  </p>
+  <p>
+    Dengan antarmuka yang bersih, interaktif, dan responsif, <strong>Prediksi-Kan</strong> cocok digunakan oleh penggemar sepak bola, analis, hingga pengembang yang tertarik pada penerapan <em>Artificial Intelligence</em> dalam dunia olahraga.  
+    Kami berkomitmen menghadirkan pengalaman analisis modern yang tidak hanya cepat, tetapi juga intuitif dan dapat diandalkan.
+  </p>
+</section>
+
 
   <section class="how-it-works">
     <h2>Cara Kerja Prediksi</h2>
@@ -83,60 +94,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const historyList = document.getElementById('history-list');
     const clearBtn = document.getElementById('clear-history');
+    
 
     async function renderHistory() {
         if (!historyList) return;
         
-        const res = await fetch('/api/history'); 
-        const data = await res.json();
-        
-        if (data.status !== 'ok') {
-            historyList.textContent = '(Gagal memuat riwayat)';
-            return;
-        }
-        const h = data.history;
-        if (!h.length) {
-            historyList.textContent = '(Belum ada riwayat)';
-            return;
-        }
-        historyList.innerHTML = '';
-        
-        h.forEach(item => { 
-            const el = document.createElement('div');
-            el.className = 'hist-item';
+        historyList.innerHTML = '<p>(Memuat riwayat...)</p>'; // Loading
+        try { 
+            const res = await fetch('/api/history'); 
+            const data = await res.json();
             
-            const timestamp = item.timestamp 
-                ? new Date(item.timestamp).toLocaleString() 
-                : '(Waktu tidak tersimpan)';
+            if (!res.ok || data.status !== 'ok') { 
+                historyList.innerHTML = '<p style="color:red;">Gagal memuat riwayat.</p>';
+                return;
+            }
+            
+            // Ambil maksimal 5 item pertama dari data API
+            const h = data.history.slice(0, 5); // <<--- BATASI 5 ITEM
+            
+            if (!h.length) {
+                historyList.textContent = '(Belum ada riwayat)';
+                return;
+            }
+            historyList.innerHTML = ''; 
+            
+            h.forEach(item => { 
+                const el = document.createElement('a'); // <<--- UBAH JADI LINK (<a>)
+                el.className = 'hist-item'; 
+                el.href = `/history/${item.id}/`; // <<--- LINK KE DETAIL
+                
+                // Format Waktu ke Bahasa Indonesia
+                const timestamp = item.timestamp 
+                    ? new Date(item.timestamp).toLocaleString('id-ID', { 
+                        day: '2-digit', month: '2-digit', year:'numeric', 
+                        hour: '2-digit', minute: '2-digit' 
+                      }) 
+                    : '(Waktu tidak tersimpan)';
 
-            el.innerHTML = `
-                <strong>${item.league}</strong>
-                <span class="hist-match">${item.home_team || 'Tim Home'} vs ${item.away_team || 'Tim Away'}</span>
-                <small>${timestamp}</small>
-                <span class="hist-preds">
-                    HDA: ${item.prediction.HDA?.label || '-'} | 
-                    OU: ${item.prediction.OU25?.label || '-'} | 
-                    BTTS: ${item.prediction.BTTS?.label || '-'}
-                </span>
-            `;
-            historyList.appendChild(el);
-        });
+                el.innerHTML = `
+                    <strong>${item.league}</strong>
+                    <span class="hist-match">${item.home_team || 'Tim Home'} vs ${item.away_team || 'Tim Away'}</span>
+                    <small>${timestamp}</small>
+                    <span class="hist-preds">
+                        HDA: ${item.prediction.HDA?.label || '-'} | 
+                        OU: ${item.prediction.OU25?.label || '-'} | 
+                        BTTS: ${item.prediction.BTTS?.label || '-'}
+                    </span>
+                `;
+                historyList.appendChild(el);
+            });
+        } catch (error) {
+             console.error("Fetch history error:", error);
+             historyList.innerHTML = '<p style="color:red;">Error koneksi saat memuat riwayat.</p>';
+        }
     }
 
+    // Event listener clearBtn tidak berubah
     if (clearBtn) {
         clearBtn.addEventListener('click', async () => {
             if (!csrfToken) {
               alert('Gagal menghapus riwayat: Token keamanan tidak ditemukan.');
               return;
             }
-            
-            await fetch('/api/clear_history', { 
-              method: 'POST',
-              headers: {
-                'X-CSRFToken': csrfToken
-              }
-            });
-            renderHistory();
+            if (confirm("Anda yakin ingin menghapus semua riwayat prediksi?")) { // Tambah konfirmasi
+                try {
+                     await fetch('/api/clear_history', { 
+                       method: 'POST',
+                       headers: { 'X-CSRFToken': csrfToken }
+                     });
+                     renderHistory(); // Muat ulang riwayat (akan kosong)
+                 } catch (error) {
+                      alert('Gagal menghapus riwayat karena error koneksi.');
+                 }
+            }
         });
     }
 
@@ -145,5 +175,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-
 {% endblock %}

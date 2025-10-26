@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'pwa',
     # Aplikasi Anda
     'predictions.apps.PredictionsConfig', # <-- Ubah ini agar signals.py dimuat
 
@@ -112,17 +112,20 @@ AUTHENTICATION_BACKENDS = [
 # ==========================================================
 # --- Konfigurasi Allauth (DIPERBARUI UNTUK MENGHILANGKAN WARNINGS) ---
 # ==========================================================
-ACCOUNT_LOGIN_METHODS = ['email']             # <-- Menggantikan ACCOUNT_AUTHENTICATION_METHOD
-ACCOUNT_SIGNUP_FIELDS = ['email']             # <-- Menggantikan ACCOUNT_EMAIL_REQUIRED
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None      # <-- Memberitahu allauth kita tidak pakai username
-ACCOUNT_USERNAME_REQUIRED = False             # <-- Ini sekarang diabaikan, tapi kita set False
+ACCOUNT_LOGIN_METHODS = ['email']             
+ACCOUNT_SIGNUP_FIELDS = ['email']             
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None      
+ACCOUNT_USERNAME_REQUIRED = False             
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_EMAIL_VERIFICATION = 'none'           # Sederhanakan, tidak perlu verifikasi email
-# ==========================================================
+ACCOUNT_EMAIL_VERIFICATION = 'none' # Email sudah diverifikasi oleh Google         
 
-LOGIN_REDIRECT_URL = '/' # Ganti login_manager.login_view
+# ▼▼▼ TAMBAHKAN BARIS INI ▼▼▼
+SOCIALACCOUNT_AUTO_SIGNUP = True # Otomatis signup saat login sosial pertama kali
+# ▲▲▲ AKHIR TAMBAHAN ▲▲▲
+
+LOGIN_REDIRECT_URL = '/' 
 LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_LOGOUT_ON_GET = True # Memudahkan logout
+ACCOUNT_LOGOUT_ON_GET = True
 
 # Konfigurasi Provider Google
 SOCIALACCOUNT_PROVIDERS = {
@@ -165,3 +168,39 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Untuk deployment Render
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==========================================================
+# PWA SETTINGS (WAJIB ADA)
+# ==========================================================
+PWA_APP_NAME = 'Prediksi-Kan'
+PWA_APP_DESCRIPTION = 'Aplikasi prediksi sepak bola bertenaga Machine Learning dan AI.'
+PWA_APP_SCOPE = '/'
+PWA_APP_START_URL = '/'
+PWA_APP_DISPLAY = 'standalone'  # Menghilangkan address bar browser
+PWA_APP_ORIENTATION = 'portrait'
+PWA_APP_STATUS_BAR_COLOR = '#0b1220' # Warna tema Anda
+PWA_APP_THEME_COLOR = '#06b6d4'   # Warna aksen
+
+# URL Ikon (perlu disiapkan)
+PWA_APP_ICONS = [
+    {
+        'src': '/static/images/prediksikan-logo.png', # 192x192
+        'sizes': '192x192'
+    },
+    {
+        'src': '/static/images/prediksikan-logo1.png', # 512x512
+        'sizes': '512x512'
+    }
+]
+
+# (Opsional) URL gambar Splash Screen (Android)
+PWA_APP_SPLASH_SCREEN = [
+    {
+        'src': '/static/images/splash-2048x2732.png',
+        'media': '(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)'
+    }
+]
+
+# Pengaturan Cache (Service Worker)
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'serviceworker.js')
+PWA_APP_DEBUG = DEBUG # Gunakan mode debug Django

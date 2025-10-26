@@ -1,0 +1,176 @@
+/* static/css/history.css */
+.history-container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+    color: #e2e8f0; /* Teks terang default */
+}
+
+.history-container h1 {
+    text-align: center;
+    color: var(--accent); /* Warna aksen */
+    margin-bottom: 30px;
+}
+
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 kolom */
+    gap: 15px;
+    margin-bottom: 40px; /* Jarak ke garis pemisah */
+}
+
+/* Style item di grid (ambil dari home.css, tapi pastikan background/border ada) */
+.hist-item-link { 
+    display: block; 
+    text-decoration: none; 
+    background: rgba(17, 24, 39, 0.7); /* Latar belakang item */
+    border: 1px solid #334155; /* Border abu-abu */
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
+    color: #e2e8f0; 
+}
+
+.hist-item-link:hover {
+    background: rgba(30, 41, 59, 0.9); /* Sedikit lebih terang saat hover */
+    transform: translateY(-3px);
+    border-color: #475569;
+}
+.hist-item-link.selected { /* Style untuk item yang sedang dipilih */
+     border-color: var(--accent);
+     box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+     background: rgba(6, 182, 212, 0.1); /* Latar aksen transparan */
+}
+
+.hist-item-link strong { /* Liga */
+    display: block;
+    color: var(--accent);
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.hist-item-link small { /* Waktu */
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+.hist-item-link span { /* Nama tim & hasil */
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.hist-match { 
+     font-weight: 500;
+}
+.hist-preds { 
+     color: var(--muted);
+}
+
+
+/* Bagian Detail Prediksi */
+.prediction-details {
+    background: var(--card); /* Gunakan var(--card) */
+    border-radius: 12px;
+    padding: 25px 30px; /* Padding lebih besar */
+    margin-top: 20px;
+    border: 1px solid #334155; /* Border */
+}
+
+.prediction-details h2 {
+    text-align: center;
+    color: var(--accent);
+    margin-bottom: 30px; /* Jarak lebih */
+    font-size: 1.6rem; /* Judul lebih besar */
+}
+.prediction-details h3 { /* Judul bagian fitur */
+     color: #93c5fd; /* Biru muda */
+     margin-top: 25px;
+     margin-bottom: 15px;
+     border-bottom: 1px solid #334155;
+     padding-bottom: 8px;
+     font-size: 1.2rem;
+}
+.prediction-details h4.stats-title { /* Judul Home/Away Stats */
+     color: #cbd5e1;
+     text-align: left;
+     font-size: 1rem;
+     margin-bottom: 10px;
+}
+
+
+/* Gunakan style fitur dari index.css tapi buat read-only */
+/* (Copy paste bagian .elo-section, .stats-section, dll. dari index.css) */
+.elo-section, .stats-section, .hth-section, .odds-group {
+    margin-bottom: 25px;
+    padding: 0; /* Hapus padding default */
+    background-color: transparent; /* Hapus background default */
+    border-radius: 0;
+}
+.grid { display: grid; gap: 15px; }
+.stats-grid, .elo-section .grid { grid-template-columns: 1fr 1fr; }
+.hth-grid, .odds-group { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); } /* Lebar minimum lebih besar */
+
+.input-wrapper { display: flex; flex-direction: column; }
+.input-wrapper label { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+
+/* Input read-only */
+.prediction-details input.auto-input {
+    background-color: #0f172a; /* Latar input sangat gelap */
+    border: 1px solid #334155; /* Border lebih gelap */
+    border-radius: 6px; 
+    padding: 8px 10px;
+    color: #9ca3af; /* Teks abu-abu (muted) */
+    font-size: 0.9rem; /* Font sedikit kecil */
+    cursor: default; 
+    box-sizing: border-box;
+    width: 100%;
+}
+.prediction-details input.auto-input:focus {
+    box-shadow: none; 
+    outline: none;
+    border-color: #334155; /* Border tidak berubah saat fokus */
+}
+
+/* Bagian Hasil Prediksi (copy dari index.css) */
+#result-details { 
+    margin-top: 30px; 
+    padding: 20px; 
+    background-color: #0f172a; /* Latar beda */
+    border: 1px solid var(--accent); 
+    border-radius: 8px; 
+}
+#result-details .result-title { text-align: center; font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-bottom: 15px; }
+#result-details #main-result { text-align: center; font-size: 1.1rem; line-height: 1.7; margin-bottom: 25px; color: #e2e8f0; }
+#result-details .prob-group { margin-bottom: 15px; }
+#result-details .prob-group h4 { margin: 0 0 10px 0; color: #cbd5e1; font-weight: 600; font-size: 1rem; }
+#result-details .prob-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; }
+#result-details .prob-item span:first-child { width: 110px; color: var(--muted); flex-shrink: 0; } /* Lebar label */
+#result-details .prob-item span:last-child { width: 50px; font-weight: 600; flex-shrink: 0; color: #e2e8f0; } /* Persentase */
+#result-details .prob-bar { flex-grow: 1; height: 16px; background-color: #1e293b; border-radius: 8px; overflow: hidden; border: 1px solid #334155; } /* Bar lebih gelap */
+#result-details .bar { height: 100%; width: 0%; border-radius: 8px; }
+
+
+/* Responsif */
+@media (max-width: 1100px) { /* Lebar container */
+    .history-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 900px) {
+    .history-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 700px) {
+    .history-container { padding: 15px; margin: 20px 10px; }
+    .history-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .hist-item-link { padding: 10px; }
+    .prediction-details { padding: 20px; }
+}
+@media (max-width: 500px) {
+    .history-grid { grid-template-columns: 1fr; }
+    .stats-grid, .elo-section .grid { grid-template-columns: 1fr; } /* Detail fitur jadi 1 kolom */
+    #result-details .prob-item span:first-child { width: 90px; } /* Label bar lebih kecil */
+}

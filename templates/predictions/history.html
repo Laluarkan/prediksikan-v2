@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load dict_filters %} {# Muat filter kustom kita #}
+
+{% block page_styles %}
+  <link rel="stylesheet" href="{% static 'css/history.css' %}">
+  {# Style inline untuk bar hasil prediksi #}
+  <style>
+       #result-details { margin-top: 30px; padding: 20px; background-color: #0f172a; border: 1px solid var(--accent); border-radius: 8px; }
+       #result-details .result-title { text-align: center; font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-bottom: 15px; }
+       #result-details #main-result { text-align: center; font-size: 1.1rem; line-height: 1.7; margin-bottom: 25px; color: #e2e8f0; }
+       #result-details .prob-group { margin-bottom: 15px; }
+       #result-details .prob-group h4 { margin: 0 0 10px 0; color: #cbd5e1; font-weight: 600; font-size: 1rem; }
+       #result-details .prob-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; }
+       #result-details .prob-item span:first-child { width: 110px; color: var(--muted); flex-shrink: 0; }
+       #result-details .prob-item span:last-child { width: 50px; font-weight: 600; flex-shrink: 0; color: #e2e8f0; }
+       #result-details .prob-bar { flex-grow: 1; height: 16px; background-color: #1e293b; border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
+       #result-details .bar { height: 100%; width: 0%; border-radius: 8px; }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="history-container">
+  <h1>Riwayat Prediksi Anda ({{ latest_histories|length }}/10 Terbaru)</h1>
+
+  {% if latest_histories %}
+    <div class="history-grid">
+      {% for item in latest_histories %}
+        <a href="{% url 'history_detail' item.id %}"
+           class="hist-item-link {% if selected_history and selected_history.id == item.id %}selected{% endif %}">
+          <strong>{{ item.league }}</strong>
+          <span class="hist-match">{{ item.home_team }} vs {{ item.away_team }}</span>
+          <small>{{ item.timestamp|date:"d-m-Y H:i" }}</small>
+          <span class="hist-preds">
+            HDA: {{ item.prediction_data.HDA.label|default:'-' }} |
+            OU: {{ item.prediction_data.OU25.label|default:'-' }} |
+            BTTS: {{ item.prediction_data.BTTS.label|default:'-' }}
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="text-align: center;">Anda belum memiliki riwayat prediksi.</p>
+  {% endif %}
+
+  {% if selected_history %}
+     <hr style="border-color: rgba(255,255,255,0.1); margin: 40px 0;">
+  {% endif %}
+
+  {% if selected_history %}
+    <div class="prediction-details">
+      <h2>Detail Prediksi: {{ selected_history.home_team }} vs {{ selected_history.away_team }}</h2>
+      <p style="text-align:center; margin-top:-20px; margin-bottom:30px; color:var(--muted);">Prediksi pada: {{ selected_history.timestamp|date:"d F Y H:i" }}</p>
+
+      {% with features=selected_history.input_features %}
+        {% if features %}
+          {# Bagian ELO (tidak berubah) #}
+          <h3>📈 Elo Rating</h3>
+          <div class="elo-section">
+              <div class="grid">
+                  {% for key in feature_columns_meta.elo %}
+                      {% if key != 'EloDifference' %}
+                           <div class="input-wrapper">
+                               <label for="hist_{{ key }}">{{ feature_labels|get_item:key|default:key }}</label>
+                               <input id="hist_{{ key }}" class="auto-input" value="{{ features|get_item:key|floatformat:2|default:'' }}" readonly>
+                           </div>
+                      {% endif %}
+                  {% endfor %}
+              </div>
+              {% if 'EloDifference' in features %}
+                   <div class="input-wrapper" style="max-width:350px; margin:18px auto 0 auto;">
+                       <label for="hist_EloDifference">{{ feature_labels|get_item:'EloDifference'|default:'EloDifference' }}</label>
+                       <input id="hist_EloDifference" class="auto-input" value="{{ features|get_item:'EloDifference'|floatformat:2|default:'' }}" readonly>
+                   </div>
+               {% endif %}
+          </div>
+
+          {# ▼▼▼ BAGIAN STATISTIK HOME & AWAY (GUNAKAN FILTER MULTIPLY) ▼▼▼ #}
+           <h3>📊 Statistik Tim (Saat Prediksi)</h3>
+           <div class="stats-section">
+               <div class="grid stats-grid">
+                   <div>
+                       <h4 class="stats-title">Statistik Tim Home</h4>
+                       {# Ambil jumlah match Home #}
+                       {% with home_wins=features|get_item:'Home_Wins'|default:0 home_draws=features|get_item:'Home_Draws'|default:0 home_losses=features|get_item:'Home_Losses'|default:0 %}
+                       {% with home_count_calc=home_wins|add:home_draws|add:home_losses %}
+                           {# Fallback ke 5 jika count 0 tapi avg tidak 0 #}
+                           {% with home_count=home_count_calc|default_if_none:5 %}
+                               {% for key in feature_columns_meta.home_stats %}
+                                   <div class="input-wrapper">
+                                       <label for="hist_{{ key }}">{{ feature_labels|get_item:key|default:key }}</label>
+                                       {# Logika untuk menampilkan total gol atau nilai asli #}
+                                       {% if 'AvgGoals' in key %}
+                                           {% with avg_goals=features|get_item:key|default:0 %}
+                                               {# Hitung total: avg * count menggunakan filter multiply #}
+                                               <input id="hist_{{ key }}" class="auto-input" value="{{ avg_goals|multiply:home_count|floatformat:0 }}" readonly>
+                                           {% endwith %}
+                                       {% else %}
+                                           {# Tampilkan nilai W/D/L seperti biasa #}
+                                           <input id="hist_{{ key }}" class="auto-input" value="{{ features|get_item:key|floatformat:0|default:'0' }}" readonly>
+                                       {% endif %}
+                                   </div>
+                               {% endfor %}
+                           {% endwith %}
+                       {% endwith %}
+                       {% endwith %}
+                   </div>
+                   <div>
+                       <h4 class="stats-title">Statistik Tim Away</h4>
+                       {# Ambil jumlah match Away #}
+                       {% with away_wins=features|get_item:'Away_Wins'|default:0 away_draws=features|get_item:'Away_Draws'|default:0 away_losses=features|get_item:'Away_Losses'|default:0 %}
+                       {% with away_count_calc=away_wins|add:away_draws|add:away_losses %}
+                           {# Fallback ke 5 jika count 0 tapi avg tidak 0 #}
+                           {% with away_count=away_count_calc|default_if_none:5 %}
+                               {% for key in feature_columns_meta.away_stats %}
+                                   <div class="input-wrapper">
+                                       <label for="hist_{{ key }}">{{ feature_labels|get_item:key|default:key }}</label>
+                                       {# Logika untuk menampilkan total gol atau nilai asli #}
+                                       {% if 'AvgGoals' in key %}
+                                           {% with avg_goals=features|get_item:key|default:0 %}
+                                               {# Hitung total: avg * count menggunakan filter multiply #}
+                                               <input id="hist_{{ key }}" class="auto-input" value="{{ avg_goals|multiply:away_count|floatformat:0 }}" readonly>
+                                           {% endwith %}
+                                       {% else %}
+                                           {# Tampilkan nilai W/D/L seperti biasa #}
+                                           <input id="hist_{{ key }}" class="auto-input" value="{{ features|get_item:key|floatformat:0|default:'0' }}" readonly>
+                                       {% endif %}
+                                   </div>
+                               {% endfor %}
+                           {% endwith %}
+                       {% endwith %}
+                       {% endwith %}
+                   </div>
+               </div>
+           </div>
+           {# ▲▲▲ AKHIR PERUBAHAN STATISTIK ▲▲▲ #}
+
+
+          {# ▼▼▼ BAGIAN HTH (GUNAKAN FILTER MULTIPLY) ▼▼▼ #}
+          <h3>🤝 Statistik H2H (Saat Prediksi)</h3>
+          <div class="hth-section">
+              {# Ambil jumlah match HTH #}
+              {% with hth_home_wins=features|get_item:'HTH_HomeWins'|default:0 hth_away_wins=features|get_item:'HTH_AwayWins'|default:0 hth_draws=features|get_item:'HTH_Draws'|default:0 %}
+              {% with hth_count_calc=hth_home_wins|add:hth_away_wins|add:hth_draws %}
+                  {# Fallback ke 5 jika count 0 tapi avg tidak 0 #}
+                  {% with hth_count=hth_count_calc|default_if_none:5 %}
+                      <div class="grid hth-grid">
+                         {% for key in feature_columns_meta.hth %}
+                            <div class="input-wrapper">
+                                <label for="hist_{{ key }}">{{ feature_labels|get_item:key|default:key }}</label>
+                                {# Logika untuk menampilkan total gol atau nilai asli #}
+                                {% if 'AvgGoals' in key %}
+                                    {% with avg_goals=features|get_item:key|default:0 %}
+                                        {# Hitung total: avg * count menggunakan filter multiply #}
+                                        <input id="hist_{{ key }}" class="auto-input" value="{{ avg_goals|multiply:hth_count|floatformat:0 }}" readonly>
+                                    {% endwith %}
+                                {% else %}
+                                    {# Tampilkan nilai W/D/L seperti biasa #}
+                                    <input id="hist_{{ key }}" class="auto-input" value="{{ features|get_item:key|floatformat:0|default:'0' }}" readonly>
+                                {% endif %}
+                            </div>
+                         {% endfor %}
+                      </div>
+                  {% endwith %}
+              {% endwith %}
+              {% endwith %}
+          </div>
+          {# ▲▲▲ AKHIR PERUBAHAN HTH ▲▲▲ #}
+
+
+          {# Bagian Odds (tidak berubah) #}
+          <h3>💰 Odds (Saat Prediksi)</h3>
+          <div class="odds-group">
+             {% for key in feature_columns_meta.odds %}
+                <div class="input-wrapper">
+                    <label for="hist_{{ key }}">{{ feature_labels|get_item:key|default:key }}</label>
+                    <input id="hist_{{ key }}" class="auto-input"
+                           value="{{ features|get_item:key|floatformat:2|default:'' }}" readonly>
+                </div>
+             {% endfor %}
+          </div>
+
+        {% else %}
+          <p style="text-align: center; color: var(--muted);">Fitur input untuk prediksi ini tidak tersimpan.</p>
+        {% endif %}
+      {% endwith %} {# Akhir alias features #}
+
+      {# Tampilkan Hasil Prediksi (Bar) #}
+      <div id="result-details">
+         <p style="text-align: center; color: var(--muted);">Memuat hasil prediksi...</p>
+      </div>
+
+    </div>
+
+    {{ selected_history.prediction_data|json_script:"prediction-data-json" }}
+
+    {# Script untuk mengisi bar hasil prediksi #}
+    <script>
+      // Fungsi getGradientColor, renderProbBlock, animateBars (tidak berubah)
+      function getGradientColor(percent) { let r, g, b = 0; if (percent < 50) { r = 255; g = Math.round(5.1 * percent); } else { g = 255; r = Math.round(510 - 5.1 * percent); } return `linear-gradient(90deg, rgb(${r},${g},0) 0%, rgb(${r},${g},0) ${percent}%)`;}
+      function renderProbBlock(title, probs) { if (!probs) return ''; let html = `<div class="prob-group"><h4>${title}</h4>`; for (const [label, val] of Object.entries(probs)) { const percent = (val * 100).toFixed(1); const gradient = getGradientColor(percent); html += `<div class="prob-item"><span>${label}</span><div class="prob-bar"><div class="bar" style="width:0%; background:${gradient}" data-percent="${percent}"></div></div><span>${percent}%</span></div>`; } html += `</div>`; return html; }
+      function animateBars() { document.querySelectorAll('#result-details .bar').forEach(bar => { const percent = bar.dataset.percent || '0'; setTimeout(() => { bar.style.transition = 'width 1s ease'; bar.style.width = `${percent}%`; }, 50); }); }
+
+      // ▼▼▼ Ambil data dari json_script ▼▼▼
+      const resultContainer = document.getElementById('result-details');
+      const predictionDataElement = document.getElementById('prediction-data-json');
+      let predictionDataJson = null;
+
+      if (predictionDataElement) {
+          try {
+              // Parse JSON dari textContent elemen script
+              predictionDataJson = JSON.parse(predictionDataElement.textContent);
+          } catch (e) {
+              console.error("Gagal parse data prediksi JSON dari script tag:", e);
+          }
+      }
+      // ▲▲▲ AKHIR PENGAMBILAN DATA ▲▲▲
+
+      // Render bar jika data berhasil diparse
+      if (resultContainer && predictionDataJson) {
+         const p = predictionDataJson;
+         const hdaLabel = p.HDA?.label || '-';
+         const ou25Label = p.OU25?.label || '-';
+         const bttsLabel = p.BTTS?.label || '-';
+
+         resultContainer.innerHTML = `
+            <div class="result-title">📊 Hasil Prediksi</div>
+            <div id="main-result">
+              🏠 (H/D/A): <b>${hdaLabel}</b><br>
+              ⚽ (O/U 2.5): <b>${ou25Label}</b><br>
+              🤝 (BTTS): <b>${bttsLabel}</b>
+            </div>
+            <div id="prob-bars" class="prob-section">
+              ${renderProbBlock('🏠 (Home / Draw / Away)', p.HDA?.probs)}
+              ${renderProbBlock('⚽ Over / Under 2.5', p.OU25?.probs)}
+              ${renderProbBlock('🤝 Both Team To Score', p.BTTS?.probs)}
+            </div>
+         `;
+         animateBars();
+      } else if (resultContainer) {
+          resultContainer.innerHTML = '<p style="text-align: center; color: var(--muted);">Data hasil prediksi tidak ditemukan atau tidak valid.</p>';
+      }
+
+    </script>
+
+  {% else %}
+    {# Pesan jika tidak ada riwayat dipilih (hanya grid atas yang tampil) #}
+    <p style="text-align: center; margin-top: 30px;">Klik salah satu riwayat di atas untuk melihat detailnya.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Gagal | Prediksi-Kan</title> {# Judul Error #}
+    
+    <link rel="icon" type="image/png" href="{% static 'images/prediksikan-logo.png' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    
+    <style>
+        .error-message {
+            color: #ff6b6b; /* Warna merah untuk error */
+            background-color: rgba(255, 107, 107, 0.1); /* Latar belakang merah transparan */
+            border: 1px solid #ff6b6b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="login-page"> {# Gunakan class yang sama #}
+    <div class="login-box"> {# Gunakan class yang sama #}
+        
+        <h2>{% trans "Login Pihak Ketiga Gagal" %}</h2>
+
+        {# Pesan error standar dari allauth #}
+        <div class="error-message">
+            <p>{% blocktranslate %}Terjadi kesalahan saat mencoba login melalui akun pihak ketiga Anda.{% endblocktranslate %}</p>
+        </div>
+
+        {# Link Kembali ke Home #}
+        <a class="back-link" href="{% url 'home' %}" style="margin-top: 0;">Kembali ke Home</a> {# Hapus margin atas #}
+    </div>
+</body>
+</html>

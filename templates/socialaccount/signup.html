@@ -1,0 +1,95 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Prediksi-Kan</title>
+    
+    <link rel="icon" type="image/png" href="{% static 'images/prediksikan-logo.png' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    
+    <style>
+        .signup-form p {
+            color: var(--muted, #9ca3af);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .signup-form label {
+            display: block;
+            text-align: left;
+            color: var(--muted, #9ca3af);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .signup-form input[type="email"] {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 1.5rem;
+            background-color: #0d1117; /* Latar belakang input gelap */
+            color: #e6edf3; /* Teks putih */
+            border: 1px solid #30363d; /* Border gelap */
+            border-radius: 6px; /* Sudut melengkung */
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .signup-form input[type="email"]:focus {
+            outline: none;
+            border-color: var(--accent, #06b6d4); /* Warna aksen saat fokus */
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.3); /* Efek glow */
+        }
+        .btn-signup {
+            display: inline-block;
+            background-color: var(--accent, #06b6d4); /* Warna aksen tema Anda */
+            color: var(--card, #111827); /* Warna teks gelap */
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s ease;
+            margin-top: 1rem;
+        }
+        .btn-signup:hover {
+            background-color: #0891b2; /* Warna aksen lebih gelap */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+         .btn-signup:active {
+             transform: translateY(0);
+             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="login-page"> {# Gunakan class yang sama #}
+    <div class="login-box"> {# Gunakan class yang sama #}
+        
+        <h2>{% trans "Sign Up" %}</h2>
+
+        {# Pesan konfirmasi dari allauth #}
+        <p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}Anda akan menggunakan akun {{ provider_name }} Anda untuk masuk ke {{ site_name }}. Sebagai langkah terakhir, silakan lengkapi formulir berikut:{% endblocktrans %}</p>
+
+        {# Form signup allauth #}
+        <form class="signup-form" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+            {% csrf_token %}
+            
+            {# Ini akan menampilkan field email (biasanya sudah terisi) #}
+            {{ form.as_p }} 
+            
+            {# Tombol submit Sign Up #}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            <button class="btn-signup" type="submit">{% trans "Sign Up" %}</button>
+        </form>
+
+        {# Link Kembali ke Home #}
+        <a class="back-link" href="{% url 'home' %}" style="margin-top: 1.5rem;">Kembali ke Home</a>
+    </div>
+</body>
+</html>
