@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <link rel="icon" type="image/png" href="{% static 'images/prediksikan-logo1.png' %}">
+
+    <title>Football Predictor</title>
+
+    {% block page_styles %}
+    {% endblock %}
+
+</head>
+<body>
+
+<nav class="main-nav">
+  <div class="nav-inner">
+    <a href="{% url 'home' %}" class="brand">
+      <img class="brand-logo" src="{% static 'images/prediksikan-logo.png' %}" alt="Logo">
+      <span class="brand-text">Prediksi-Kan</span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'index' %}">Prediksi</a></li>
+      <li><a href="{% url 'stats' %}">Statistik</a></li>
+      
+      {% if user.is_authenticated %}
+        {% if user.role == 'admin' %}
+          <li class="mobile-only"><a href="{% url 'add_data' %}">Tambah Data</a></li>
+        {% endif %}
+        
+        <li class="mobile-only"><a href="{% url 'account_logout' %}">Logout ({{ user.first_name|default:user.email }})</a></li>
+        
+        <li class="profile-dropdown desktop-only">
+          <button class="profile-icon" id="profile-toggle">
+            {{ user.first_name.0|upper|default:user.email.0|upper }}
+          </button>
+          <ul class="dropdown-menu" id="profile-menu">
+            <li class="dropdown-header">
+              Login sebagai:<br>
+              <strong>{{ user.first_name }} {{ user.last_name|default:user.email }}</strong>
+            </li>
+            {% if user.role == 'admin' %}
+              <li><a href="{% url 'add_data' %}">Tambah Data</a></li>
+            {% endif %}
+            <li><a href="{% url 'account_logout' %}">Logout</a></li>
+          </ul>
+        </li>
+      {% else %}
+        <li><a href="{% url 'account_login' %}" class="nav-login-btn">Login</a></li>
+      {% endif %}
+    </ul>
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+      ☰
+    </button>
+  </div>
+</nav>
+
+<div class="flash-container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash-msg flash-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+</div>
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+<script>
+  const navToggle = document.getElementById("nav-toggle");
+  const navLinks = document.getElementById("nav-links");
+  if (navToggle && navLinks) {
+    navToggle.addEventListener("click", () => {
+      navLinks.classList.toggle("show");
+    });
+  }
+
+  const profileToggle = document.getElementById("profile-toggle");
+  const profileMenu = document.getElementById("profile-menu");
+  if (profileToggle && profileMenu) {
+    profileToggle.addEventListener("click", () => {
+      profileMenu.classList.toggle("show");
+    });
+    window.addEventListener("click", (e) => {
+      if (!profileToggle.contains(e.target) && !profileMenu.contains(e.target)) {
+        profileMenu.classList.remove("show");
+      }
+    });
+  }
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const flashMessages = document.querySelectorAll('.flash-msg');
+    flashMessages.forEach(msg => {
+      setTimeout(() => {
+          msg.classList.add('fade-out');
+          setTimeout(() => {
+              msg.remove();
+          }, 500); 
+      }, 2000); // 2 detik
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+/* static/css/home.css */
+
+/* Kerapian Tata Letak: Kontainer Utama */
+.home-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Hero section */
+.hero {
+  background: linear-gradient(180deg, #0b1220, #071023);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.05);
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+}
+
+.hero p {
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.hero-actions {
+  margin-top: 25px;
+}
+
+.hero .league-info {
+  padding: 10px 15px;
+  max-width: 500px;
+  margin: 20px auto;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* ====== Tata Letak Riwayat Prediksi ====== */
+#history-list {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: auto;
+  gap: 12px;
+  margin-top: 12px;
+  margin: 20px;
+}
+
+.history h2 {
+  margin: 10px;
+  color: white;
+}
+
+.history {
+  margin: 20px;
+}
+
+.hist-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease, background 0.2s ease;
+  overflow: hidden;
+}
+
+.hist-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+.hist-item strong {
+  display: block;
+  color: var(--accent);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.hist-item small {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.hist-item span {
+  display: block;
+  margin-top: 4px;
+  color: #d1e7f5;
+  font-size: 0.85rem;
+}
+
+.history-actions {
+  text-align: right;
+}
+
+.history-actions .btn.small {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  transition: 0.2s;
+}
+
+.history-actions .btn.small:hover {
+  background: var(--accent);
+  color: #052025;
+}
+
+
+/* Tambahan Informasi */
+.about, .how-it-works{
+  background: var(--card);
+  margin: 32px auto;
+  padding: 24px;
+  border-radius: 10px;
+  max-width: 900px;
+  border: 1px solid rgba(255,255,255,.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.about h2, .how-it-works h2, .contact h2 {
+  text-align: center;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.about p, .how-it-works p, .contact p, .how-it-works ol {
+  color: #cbd5e1;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.how-it-works ol {
+  margin-left: 20px;
+}
+
+.contact {
+  text-align: center;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 15px;
+}
+
+.social-links img {
+  width: 36px;
+  height: 36px;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.social-links img:hover {
+  transform: scale(1.15);
+  opacity: 1;
+}
+
+/* Login Prompt */
+.login-prompt {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 32px auto;
+  max-width: 700px;
+}
+
+.login-prompt h2 {
+  color: var(--accent, #06b6d4);
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.login-prompt p {
+  color: #cbd5e1;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.login-prompt .btn {
+  background: var(--accent);
+  color: #052025;
+  /* color: white; */ /* Ini duplikat dari file Anda, saya pilih salah satu */
+  padding: 12px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.login-prompt .btn:hover {
+  background: #0891b2;
+}
+
+/* Saran/Feedback */
+.suggestion-link {
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid var(--accent, #06b6d4);
+  padding: 15px 20px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 32px auto 10px auto;
+  max-width: 700px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.suggestion-link p {
+  margin: 0;
+  color: #d1e7f5;
+  font-size: 0.95rem;
+}
+
+.suggestion-link .btn.small {
+  background: var(--accent);
+  color: #052025;
+}
+
+.suggestion-link .btn.small:hover {
+  background: #0891b2;
+}
+
+.about p.highlight-info {
+  background: rgba(15, 23, 42, 0.8);
+  border-left: 4px solid var(--accent);
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+
+/* Responsif */
+@media (max-width: 700px) {
+  .about, .how-it-works, .contact {
+    padding: 18px;
+    margin: 10px 20px;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-actions .btn {
+    display: block;
+    margin: 8px auto;
+    text-align: center;
+    width: fit-content;
+  }
+  
+  .suggestion-link {
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 10px 10px 10px;
+  }
+}
+
+/* Responsif untuk layar kecil */
+@media (max-width: 1000px) {
+  #history-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  #history-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .login-prompt {
+    margin: 10px 10px;
+  }
+}
+
+@media (max-width: 500px) {
+  #history-list {
+    grid-template-columns: 1fr;
+  }
+}

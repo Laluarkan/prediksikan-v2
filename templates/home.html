@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block page_styles %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<div class="home-container">
+  
+  {% csrf_token %}
+
+  <header class="hero">
+    <h1>Selamat datang di Prediksi-Kan</h1>
+    <p>Lihat prediksi terbaru, statistik tim, dan dukung pengembangan.</p>
+    
+      <p class="league-info">
+      🏆 Kami FOKUS pada <strong>5 Liga Elite Eropa</strong>: Premier League, La Liga, Serie A, Bundesliga, & Ligue 1.
+    </p>
+    
+    <div class="hero-actions">
+      <a class="btn" href="{% url 'index' %}">Prediksi Sekarang</a>
+      <a class="btn sawer" href="https://saweria.co/prediksikan" target="_blank">Dukung Kami</a>
+    </div>
+  </header>
+
+  <section class="suggestion-link">
+      <p>Punya ide fitur atau menemukan *bug*? Bantu kami jadi lebih baik!</p>
+      <a href="https://saweria.co/prediksikan" target="_blank" class="btn small suggestion-btn">Kirim Saran Pengembangan</a>
+  </section>
+  
+  {% if not user.is_authenticated %}
+  <section class="login-prompt">
+      <h2>Simpan Riwayat Prediksi Anda! 📝</h2>
+      <p>Ingin melihat kembali prediksi yang pernah Anda buat? Login dengan akun Google Anda untuk menyimpan riwayat secara otomatis.</p>
+      <a href="{% provider_login_url 'google' %}" class="btn">Login dengan Google</a>
+  </section>
+  {% endif %}
+  
+  {% if user.is_authenticated %}
+  <section class="history">
+    <h2>Riwayat Prediksi</h2>
+    <div id="history-list">(Memuat riwayat...)</div>
+    <div class="history-actions">
+      <button id="clear-history" class="btn small">Bersihkan Riwayat</button>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="about">
+      <h2>Tentang Aplikasi Prediksi-Kan</h2>
+        <p>
+        <strong>Prediksi-Kan</strong> adalah aplikasi web yang membantu kamu memprediksi hasil pertandingan sepak bola
+        menggunakan model machine learning. Dirancang agar mudah digunakan, hasil analisis ditampilkan secara interaktif
+        dengan antarmuka yang bersih dan ringan.
+      </p>
+  </section>
+
+  <section class="how-it-works">
+    <h2>Cara Kerja Prediksi</h2>
+    <ol>
+      <li>Pilih liga dan tim yang ingin kamu analisis di halaman <strong>Prediksi</strong>.</li>
+      <li>Data dimasukkan ke dalam model pembelajaran mesin yang telah dilatih.</li>
+      <li>Hasil prediksi ditampilkan langsung dan disimpan ke dalam riwayat (jika Anda login).</li>
+    </ol>
+    <p>Kamu juga bisa memantau performa prediksi di halaman <strong>Statistik</strong>.</p>
+  </section>
+</div>
+
+<footer class="main-footer">
+    <div class="footer-copyright">&copy; 2025 Prediksi-Kan. All rights reserved.</div>
+    <div class="footer-data-source">Data sourced from <a href="https://www.football-data.co.uk/" target="_blank" rel="noopener noreferrer">football-data.co.uk</a></div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const csrfTokenEl = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    const csrfToken = csrfTokenEl ? csrfTokenEl.value : null;
+
+    const historyList = document.getElementById('history-list');
+    const clearBtn = document.getElementById('clear-history');
+
+    async function renderHistory() {
+        if (!historyList) return;
+        
+        const res = await fetch('/api/history'); 
+        const data = await res.json();
+        
+        if (data.status !== 'ok') {
+            historyList.textContent = '(Gagal memuat riwayat)';
+            return;
+        }
+        const h = data.history;
+        if (!h.length) {
+            historyList.textContent = '(Belum ada riwayat)';
+            return;
+        }
+        historyList.innerHTML = '';
+        
+        h.forEach(item => { 
+            const el = document.createElement('div');
+            el.className = 'hist-item';
+            
+            const timestamp = item.timestamp 
+                ? new Date(item.timestamp).toLocaleString() 
+                : '(Waktu tidak tersimpan)';
+
+            el.innerHTML = `
+                <strong>${item.league}</strong>
+                <span class="hist-match">${item.home_team || 'Tim Home'} vs ${item.away_team || 'Tim Away'}</span>
+                <small>${timestamp}</small>
+                <span class="hist-preds">
+                    HDA: ${item.prediction.HDA?.label || '-'} | 
+                    OU: ${item.prediction.OU25?.label || '-'} | 
+                    BTTS: ${item.prediction.BTTS?.label || '-'}
+                </span>
+            `;
+            historyList.appendChild(el);
+        });
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', async () => {
+            if (!csrfToken) {
+              alert('Gagal menghapus riwayat: Token keamanan tidak ditemukan.');
+              return;
+            }
+            
+            await fetch('/api/clear_history', { 
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': csrfToken
+              }
+            });
+            renderHistory();
+        });
+    }
+
+    if (historyList) {
+        renderHistory();
+    }
+});
+</script>
+
+{% endblock %}

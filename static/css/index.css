@@ -1,0 +1,288 @@
+/* static/css/index.css */
+
+/* ====== STYLE KONTAINER & FORMULIR ====== */
+.container {
+    max-width: 800px;
+    margin: 30px auto !important;
+    padding: 20px;
+    background-color: var(--card); 
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.05);
+}
+
+h1, h2 {
+    text-align: center;
+    color: #fff;
+}
+/* ... (style h1, note, form-group, hidden tidak berubah) ... */
+h1 {
+    font-size: 1.8rem;
+    margin-top: 0;
+}
+
+.note, .note-elo {
+    background-color: rgba(243, 156, 18, 0.1);
+    border: 1px solid #f39c12;
+    color: #f39c12;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+
+.hidden {
+    display: none;
+}
+
+/* ======================================================= */
+/* ====== STYLE UNTUK CHOICES.JS (PERBAIKAN V2) ====== */
+/* ======================================================= */
+
+.choices {
+    margin-bottom: 0;
+}
+
+/* Latar belakang dropdown (saat tertutup) */
+.choices .choices__inner {
+    background-color: #0b1220;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 20px !important;
+    padding: 4px 10px !important;
+    font-size: 1rem;
+    color: #e6eef8; 
+    width: 93% !important;
+}
+
+/* Teks placeholder (misal "Pilih tim...") */
+.choices .choices__inner .choices__placeholder {
+    color: var(--muted);
+}
+
+.choices[data-type*="select-one"] .choices__inner {
+    padding-bottom: 2px !important;
+}
+
+/* Latar belakang dropdown (saat dibuka) */
+.choices .choices__list--dropdown {
+    background-color: var(--card);
+    border: 1px solid rgba(255,255,255,.1);
+}
+
+/* ▼▼▼ PERBAIKAN DI SINI ▼▼▼
+  Input pencarian di dalam dropdown (yang putih)
+*/
+.choices .choices__list--dropdown .choices__input {
+     background-color: #0b1220 !important; /* Paksa latar belakang gelap */
+     color: #e6eef8 !important; /* Paksa teks putih */
+     border-bottom: 1px solid var(--accent) !important; /* Tambahkan border aksen */
+}
+
+/* Opsi/Item di dalam dropdown */
+.choices__list--dropdown .choices__item--selectable {
+    color: #e6eef8; /* Teks opsi */
+}
+
+/* ▼▼▼ PERBAIKAN DI SINI ▼▼▼
+  Opsi/Item saat di-hover (yang putih)
+*/
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background-color: var(--accent) !important; /* Paksa warna aksen */
+    color: var(--card) !important; /* Paksa teks gelap */
+}
+
+/* PERBAIKAN DARI SEBELUMNYA
+  Dropdown 'Home' & 'Away' saat disabled (putih) 
+*/
+.choices.is-disabled .choices__inner {
+    background-color: #0b1220 !important; 
+    border: 1px solid rgba(255,255,255,.1) !important; 
+}
+
+.choices.is-disabled .choices__inner .choices__placeholder {
+    color: var(--muted);
+}
+/* ======================================================= */
+/* ====== AKHIR PERBAIKAN CHOICES.JS ====== */
+/* ======================================================= */
+
+
+/* ====== STYLE BAGIAN FITUR (FEATURE SECTION) ====== */
+#feature-section {
+    border-top: 1px solid rgba(255,255,255,.1);
+    margin-top: 30px;
+    padding-top: 20px;
+}
+
+.elo-section, 
+.stats-section, 
+.hth-section, 
+.odds-group {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 8px;
+}
+
+.stats-title, 
+.odds-title {
+    text-align: center;
+    color: var(--accent);
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.grid {
+    display: grid;
+    gap: 15px;
+}
+
+/* Grid 2 kolom untuk Elo dan Statistik */
+.stats-grid,
+.elo-section .grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+/* Grid responsif untuk H2H dan Odds */
+.hth-grid,
+.odds-group {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-wrapper label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 5px;
+}
+
+.auto-input {
+    background-color: #0b1220;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px !important; /* <-- Tambahkan ini untuk sudut melengkung */
+    padding: 8px 10px;
+    color: #e6eef8;
+    font-size: 0.95rem;
+}
+
+.auto-input {
+    background-color: #0b1220;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: #e6eef8;
+    font-size: 0.95rem;
+}
+
+/* Tombol Prediksi (menggunakan style .btn dari universal) */
+#PredictBtn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+
+/* ====== STYLE BAGIAN HASIL (RESULT SECTION) ====== */
+#result {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #0b1220;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+}
+
+.result-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 15px;
+}
+
+#main-result {
+    text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 25px;
+}
+
+.prob-group {
+    margin-bottom: 15px;
+}
+
+.prob-group h4 {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-weight: 600;
+}
+
+.prob-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.prob-item span:first-child { /* Label (Home, Draw, ...) */
+    width: 100px;
+    color: var(--muted);
+    flex-shrink: 0;
+}
+
+.prob-item span:last-child { /* Persentase (50.5%) */
+    width: 50px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.prob-bar { /* Latar belakang bar */
+    flex-grow: 1;
+    height: 18px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.1);
+}
+
+.bar { /* Bar yang diisi (warnanya dari JS) */
+    height: 100%;
+    width: 0%; /* Diatur oleh JS */
+    border-radius: 3px;
+}
+
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+        margin: 30px 20px !important;
+    }
+
+    .stats-grid,
+    .elo-section .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .prob-item span:first-child {
+        width: 80px;
+    }
+}

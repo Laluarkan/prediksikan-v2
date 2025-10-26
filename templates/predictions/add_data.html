@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Tambah Data (Khusus Admin)</h1>
+    <p>Tempatkan formulir upload CSV dan tabel data baru Anda di sini.</p>
+    
+    <select id="league-select-admin">
+        {% for league in leagues %}
+            <option value="{{ league }}">{{ league }}</option>
+        {% endfor %}
+    </select>
+    
+    {% endblock %}
