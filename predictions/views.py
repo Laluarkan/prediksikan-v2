@@ -100,7 +100,6 @@ def api_leagues(request):
     leagues = list_leagues()
     return JsonResponse({'status': 'ok', 'leagues': leagues})
 
-@csrf_exempt 
 @require_POST
 def api_team_stats(request):
     # ... (kode Anda tidak berubah) ...
@@ -146,8 +145,6 @@ def api_teams(request):
     except FileNotFoundError as e: return JsonResponse({'status': 'error', 'message': str(e)}, status=404)
     except Exception as e: return JsonResponse({'status':'error','message': f"Error: {e}"}, status=500)
 
-
-@csrf_exempt
 @require_POST
 def api_features(request):
     # ... (kode Anda tidak berubah) ...
@@ -164,7 +161,6 @@ def api_features(request):
     except Exception as e: return JsonResponse({'status': 'error', 'message': f"Gagal menghitung fitur: {e}"}, status=500)
 
 # ▼▼▼ PERBARUI VIEW INI ▼▼▼
-@csrf_exempt
 @require_POST
 def api_predict(request):
     try:
@@ -343,7 +339,6 @@ def api_history(request):
     return JsonResponse({'status': 'ok', 'history': history_list})
 # ▲▲▲ AKHIR PERUBAHAN api_history ▲▲▲
 
-@csrf_exempt
 @login_required
 @require_POST
 def api_clear_history(request):
@@ -357,38 +352,105 @@ def api_clear_history(request):
 # ==========================================================
 # ROUTES ADMIN (ADD DATA) - Tidak Berubah
 # ==========================================================
-@csrf_exempt 
 @login_required
 @admin_required
 @require_POST
 def api_upload_csv(request):
-    # ... (kode Anda tidak berubah) ...
-    league = request.POST.get('league'); file = request.FILES.get('file')
-    if not all([league, file]): return JsonResponse({'status': 'error', 'message': 'Liga dan file CSV diperlukan'}, status=400)
+    """
+    Menerima upload CSV, memfilter hanya kolom input dasar,
+    menghitung fitur (Elo, Stats, H2H) di backend,
+    dan mengembalikan fitur lengkap sebagai JSON.
+    """
+    league = request.POST.get('league')
+    file = request.FILES.get('file')
+
+    if not all([league, file]):
+        return JsonResponse({'status': 'error', 'message': 'Liga dan file CSV diperlukan'}, status=400)
+    
+    # Tentukan 11 kolom dasar yang kita ambil dari CSV
+    INPUT_COLUMNS = [
+        'Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR',
+        'AvgH', 'AvgD', 'AvgA', 'Avg>2.5', 'Avg<2.5'
+    ]
+
     try:
-        df_new = pd.read_csv(file)
+        # 1. Baca CSV
+        df_new_raw = pd.read_csv(file)
+        
+        # 2. Cek apakah kolom dasar ada
+        if not all(col in df_new_raw.columns for col in INPUT_COLUMNS):
+            missing_cols = [col for col in INPUT_COLUMNS if col not in df_new_raw.columns]
+            return JsonResponse({'status': 'error', 'message': f'CSV Anda kekurangan kolom: {", ".join(missing_cols)}'}, status=400)
+
+        # 3. Filter HANYA 11 kolom input (memenuhi permintaan Anda)
+        df_new = df_new_raw[INPUT_COLUMNS].copy()
+
+        # 4. Bersihkan tipe data (SANGAT PENTING)
+        
+        # ▼▼▼ PERBAIKAN FORMAT TANGGAL ▼▼▼
+        # Coba tebak format tanggal (misal DD/MM/YYYY atau YYYY-MM-DD)
+        # dayfirst=True membantu pandas memprioritaskan DD/MM/YYYY
+        df_new['Date'] = pd.to_datetime(df_new['Date'], dayfirst=True, errors='coerce') 
+        
+        # Buang baris yang tanggalnya tidak valid (NaT)
+        if df_new.empty:
+             return JsonResponse({'status': 'error', 'message': 'Tidak ada baris dengan format tanggal yang valid di CSV.'}, status=400)
+        # ▲▲▲ AKHIR PERBAIKAN TANGGAL ▲▲▲
+
+        # Konversi Skor (sudah ada di kode Anda)
         score_cols = ['FTHG', 'FTAG']
         for col in score_cols:
             if col in df_new.columns:
                 df_new[col] = pd.to_numeric(df_new[col], errors='coerce')
                 df_new[col] = df_new[col].fillna(0).astype(int)
+
+        # 5. Muat data lama (sudah di-convert ke datetime oleh load_league_dataset_by_name)
         df_existing = load_league_dataset_by_name(league)
-        mask_new = ~df_new.apply(lambda r: ((df_existing['Date'] == r['Date']) & (df_existing['HomeTeam'] == r['HomeTeam']) & (df_existing['AwayTeam'] == r['AwayTeam'])).any(), axis=1)
+        
+        # 6. Filter pertandingan baru (sekarang membandingkan datetime vs datetime)
+        # Buat 'match_id' unik untuk perbandingan
+        df_existing['match_id_str'] = df_existing['Date'].dt.strftime('%Y-%m-%d') + df_existing['HomeTeam'] + df_existing['AwayTeam']
+        existing_matches_str = set(df_existing['match_id_str'])
+        
+        df_new['match_id_str'] = df_new['Date'].dt.strftime('%Y-%m-%d') + df_new['HomeTeam'] + df_new['AwayTeam']
+
+        mask_new = ~df_new['match_id_str'].isin(existing_matches_str)
+        
         df_new_only = df_new[mask_new].copy()
-        if df_new_only.empty: return JsonResponse({'status': 'ok', 'message': 'Tidak ada pertandingan baru'}, status=200)
+        
+        # Hapus kolom helper
+        df_new_only.drop(columns=['match_id_str'], inplace=True)
+        if 'match_id_str' in df_existing.columns:
+            df_existing.drop(columns=['match_id_str'], inplace=True)
+
+
+        if df_new_only.empty:
+            return JsonResponse({'status': 'ok', 'message': 'Tidak ada pertandingan baru yang ditemukan.'}, status=200)
+
+        # 7. Hitung fitur (Elo, Stats, H2H) menggunakan logic.py
         df_new_full = update_elo_and_features(df_existing, df_new_only)
+        
+        # 8. Format output untuk ditampilkan di tabel
         df_output = df_new_full.copy()
+        
         if 'Date' in df_output.columns:
             df_output['Date'] = pd.to_datetime(df_output['Date'], errors='coerce')
             df_output['Date'] = df_output['Date'].dt.strftime('%Y-%m-%d %H:%M:%S')
-        cols_to_format = list(df_output.columns); cols_skip = ['HomeTeam', 'AwayTeam', 'FTR', 'HTR', 'Div', 'Date']
+
+        cols_to_format = list(df_output.columns)
+        cols_skip = ['HomeTeam', 'AwayTeam', 'FTR', 'HTR', 'Div', 'Date']
         for col in cols_to_format:
             if col not in cols_skip and pd.api.types.is_numeric_dtype(df_output[col]):
                 df_output[col] = df_output[col].apply(format_float_clean)
-        return JsonResponse({'status': 'ok', 'matches': df_output.to_dict(orient='records')})
-    except Exception as e: return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
-@csrf_exempt
+        return JsonResponse({'status': 'ok', 'matches': df_output.to_dict(orient='records')})
+    
+    except FileNotFoundError as e:
+         return JsonResponse({'status': 'error', 'message': f'Gagal memuat dataset liga: {e}'}, status=404)
+    except Exception as e:
+        traceback.print_exc() # Cetak error lengkap di terminal Django
+        return JsonResponse({'status': 'error', 'message': f'Terjadi kesalahan internal: {e}'}, status=500)
+
 @login_required
 @admin_required
 @require_POST
@@ -409,7 +471,6 @@ def api_save_new_matches(request):
         return JsonResponse({'status': 'ok', 'message': 'Pertandingan baru berhasil disimpan'})
     except Exception as e: return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
-@csrf_exempt
 @require_POST
 @login_required
 def api_save_choice(request):

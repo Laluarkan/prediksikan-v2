@@ -1,0 +1,1 @@
+web: gunicorn football_project.wsgi

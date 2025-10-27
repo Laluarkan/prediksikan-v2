@@ -163,7 +163,7 @@
 
         <h3 class="odds-title">💰 Odds</h3>
         <div class="odds-group">
-            <div class="input-wrapper"><label for="AvgH">Odds Home</label><input id="AvgH" class="auto-input"></div>
+            <div class="input-wrapper"><label for="AvgH">Odds Home</label><input id="AvgH"  class="auto-input"></div>
             <div class="input-wrapper"><label for="AvgD">Odds Draw</label><input id="AvgD" class="auto-input"></div>
             <div class="input-wrapper"><label for="AvgA">Odds Away</label><input id="AvgA" class="auto-input"></div>
             <div class="input-wrapper"><label for="AvgOver25">Odds Over 2.5</label><input id="AvgOver25" class="auto-input"></div>
@@ -430,12 +430,25 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error('Fitur pertandingan belum dimuat. Silakan pilih tim terlebih dahulu.');
         }
         const featuresForPrediction = { ...currentFeatures };
-        featuresForPrediction.AvgH = parseFloat(document.getElementById('AvgH').value) || 0;
-        featuresForPrediction.AvgD = parseFloat(document.getElementById('AvgD').value) || 0;
-        featuresForPrediction.AvgA = parseFloat(document.getElementById('AvgA').value) || 0;
-        featuresForPrediction['Avg>2.5'] = parseFloat(document.getElementById('AvgOver25').value) || 0;
-        featuresForPrediction['Avg<2.5'] = parseFloat(document.getElementById('AvgUnder25').value) || 0;
-        return featuresForPrediction;
+        const parseOdd = (id) => {
+            const val = document.getElementById(id).value;
+            const parsedVal = parseFloat(val);
+            
+            // Jika val string kosong ("") atau tidak valid (NaN)
+            if (isNaN(parsedVal) || val.trim() === '') {
+                return 1; // Default ke 1
+            }
+            // Jika valid (termasuk jika user mengetik 0), gunakan nilai tersebut
+            return parsedVal; 
+        };
+
+        featuresForPrediction.AvgH = parseOdd('AvgH');
+        featuresForPrediction.AvgD = parseOdd('AvgD');
+        featuresForPrediction.AvgA = parseOdd('AvgA');
+        featuresForPrediction['Avg>2.5'] = parseOdd('AvgOver25');
+        featuresForPrediction['Avg<2.5'] = parseOdd('AvgUnder25');
+        
+        return featuresForPrediction;
     }
 
     // ===================== TAMPILKAN HASIL =====================
