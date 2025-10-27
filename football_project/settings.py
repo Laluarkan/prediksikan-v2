@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = 'static/'
 load_dotenv(os.path.join(BASE_DIR, '.env'))
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # --- 1. Gantikan Konfigurasi Flask Anda ---
 SECRET_KEY = os.environ.get('FLASK_SECRET_KEY') # Ambil dari environment
@@ -75,7 +74,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware', # <-- Tambahkan ini
+    'allauth.account.middleware.AccountMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
 ]
 
 ROOT_URLCONF = 'football_project.urls'
@@ -172,7 +172,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Untuk deployment Render
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
