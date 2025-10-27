@@ -1,0 +1,14 @@
+# Folder Virtual Environment
+venv/
+__pycache__/
+
+# File Rahasia & Environment
+.env
+*.sqlite3
+db.sqlite3
+
+# File statis yang dikumpulkan (kita ingin Render membuatnya sendiri)
+staticfiles/
+
+# File media (jika Anda punya upload gambar)
+media/
