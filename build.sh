@@ -15,3 +15,11 @@ python manage.py migrate
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
+
+# ▼▼▼ TAMBAHKAN BARIS INI ▼▼▼
+echo "Creating superuser..."
+# Perintah ini akan menggunakan env var (DJANGO_SUPERUSER_*)
+# '--no-input' berarti tidak interaktif
+# '|| true' berarti build tidak akan gagal jika superuser sudah ada
+python manage.py createsuperuser --no-input || true
+# ▲▲▲ AKHIR TAMBAHAN ▲▲▲
