@@ -141,20 +141,22 @@ def compute_features_all_leagues(home_team, away_team, window=5):
 
 # ▼▼▼ PERBARUI FUNGSI INI ▼▼▼
 # Tambahkan parameter 'input_features'
-def add_prediction_to_history(user, prediction_dict, input_features=None): 
+def add_prediction_to_history(user, prediction_dict, input_features=None):
     if not user.is_authenticated:
-        return
+        return None # <-- Kembalikan None jika tidak login
     try:
-        PredictionHistory.objects.create(
+        new_history = PredictionHistory.objects.create(
             user = user,
             league = prediction_dict.get('league'),
             home_team = prediction_dict.get('home_team'),
             away_team = prediction_dict.get('away_team'),
             prediction_data = prediction_dict.get('prediction'),
-            input_features = input_features # <-- Simpan fitur input
+            input_features = input_features
         )
+        return new_history # <<< KEMBALIKAN OBJEK YANG BARU DIBUAT
     except Exception as e:
         print(f"Gagal menyimpan riwayat ke DB: {e}")
+        return None # Kembalikan None jika gagal
 # ▲▲▲ AKHIR PERUBAHAN ▲▲▲
 
 # ==========================================================

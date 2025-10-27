@@ -241,55 +241,104 @@ h1 {
 
 .prob-item {
     display: flex;
+    flex-wrap: wrap; /* Izinkan wrap ke baris baru di layar kecil */
     align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-    font-size: 0.95rem;
+    gap: 6px 10px; /* Jarak vertikal 6px, horizontal 10px */
+    margin-bottom: 10px; /* Jarak antar item */
 }
 
-.prob-item span:first-child { /* Label (Home, Draw, ...) */
-    width: 100px;
+.prob-label { /* Label (Home, Draw, ...) */
+    width: 80px; 
     color: var(--muted);
     flex-shrink: 0;
+    font-size: 0.9rem; 
 }
 
-.prob-item span:last-child { /* Persentase (50.5%) */
+.prob-bar { /* Latar belakang bar */
+    flex-grow: 1; /* Tetap isi ruang */
+    height: 18px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 9px !important; /* Jaga radius */
+    overflow: hidden !important; /* Jaga overflow */
+    border: 1px solid rgba(255,255,255,.1);
+    min-width: 100px; /* Lebar minimum bar */
+}
+
+.bar { /* Bar yang diisi */
+    height: 100%;
+    width: 0%; 
+    border-radius: 9px !important; /* Jaga radius */
+}
+
+.prob-percent { /* Persentase (misal 40.7%) */
     width: 50px;
     font-weight: 600;
     flex-shrink: 0;
+    text-align: right; /* Ratakan ke kanan agar rapi */
+    font-size: 0.9rem; 
 }
 
-/* ▼▼▼ PERBAIKAN BAR MELENGKUNG DIMULAI DI SINI ▼▼▼ */
-.prob-bar { /* Latar belakang bar */
-    flex-grow: 1;
-    height: 18px; /* Tentukan tinggi bar */
-    background-color: rgba(0,0,0,0.3);
-    border-radius: 9px !important; /* <<< Setengah dari height + !important */
-    overflow: hidden !important; /* <<< Penting + !important */
-    border: 1px solid rgba(255,255,255,.1);
+/* Kontainer Tombol "Pilih Ini" */
+.prob-button-container {
+    width: 100%; /* Lebar penuh di baris baru (mobile-first) */
+    margin-top: 5px; /* Beri jarak atas jika wrap */
+    flex-basis: 100%; /* Pastikan mengisi 1 baris penuh */
 }
 
-.bar { /* Bar yang diisi (warnanya dari JS) */
-    height: 100%;
-    width: 0%; /* Diatur oleh JS */
-    border-radius: 9px !important; /* <<< Samakan radius + !important */
+.prob-button-container button.btn {
+    width: 100%; /* Tombol jadi lebar penuh */
+    padding: 8px; 
+    font-size: 0.9rem; 
+    background-color: var(--accent); 
+    color: #052025; 
 }
-/* ▲▲▲ AKHIR PERBAIKAN BAR MELENGKUNG ▲▲▲ */
+.prob-button-container button.btn:hover {
+     background-color: #0891b2; 
+}
+/* ▲▲▲ AKHIR STYLE BARU ▲▲▲ */
 
 
 /* ====== RESPONSIVE ====== */
 @media (max-width: 600px) {
     .container {
-        padding: 15px; /* Sedikit lebih banyak padding */
-        margin: 20px 10px !important; /* Margin layar kecil */
+        padding: 15px; 
+        margin: 20px 10px; 
     }
-
     .stats-grid,
     .elo-section .grid {
         grid-template-columns: 1fr;
     }
+    /* .prob-item span:first-child (sudah diatur di .prob-label) */
+}
 
-    .prob-item span:first-child {
-        width: 80px;
+/* ▼▼▼ MEDIA QUERY BARU UNTUK DESKTOP ▼▼▼ */
+@media (min-width: 768px) {
+    .prob-item {
+        flex-wrap: nowrap; /* <<< Jangan wrap di desktop */
+        margin-bottom: 8px; 
+    }
+    
+    .prob-label { /* Label */
+        width: 100px; /* Kembalikan ke 100px */
+        font-size: 0.95rem; /* Kembalikan font size */
+    }
+    
+    .prob-percent { /* Persentase */
+         text-align: left; /* Kembalikan ke rata kiri */
+         font-size: 0.95rem; /* Kembalikan font size */
+    }
+
+    /* Kembalikan style tombol ke inline */
+    .prob-button-container {
+        width: 100px; /* <<< Kembalikan ke 100px */
+        margin-left: 15px; /* Kembalikan margin kiri */
+        margin-top: 0; /* Hapus jarak atas */
+        flex-basis: auto; /* Hapus basis 100% */
+    }
+    
+    .prob-button-container button.btn {
+        width: 100%; /* Tetap 100% dari container 100px */
+        padding: 6px 10px; /* Padding .btn.small */
+        font-size: 0.85rem; /* Font .btn.small */
     }
 }

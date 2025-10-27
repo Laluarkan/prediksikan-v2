@@ -103,6 +103,39 @@
      margin-bottom: 10px;
 }
 
+.user-choices-detail {
+    background-color: rgba(6, 182, 212, 0.1); /* Latar aksen transparan */
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-top: 25px; /* Jarak dari sub-judul waktu */
+    margin-bottom: 30px;
+    text-align: center;
+}
+.user-choices-detail h3 {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-size: 1.2rem;
+    border-bottom: none; /* Hapus border */
+    padding-bottom: 0;
+}
+.user-choices-detail p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #e2e8f0;
+    display: flex; /* Gunakan flexbox */
+    justify-content: center; /* Tengah */
+    gap: 20px; /* Jarak antar item */
+    flex-wrap: wrap; /* Wrap di layar kecil */
+}
+.user-choices-detail p span {
+    display: inline-block; /* Tampilkan inline */
+}
+.user-choices-detail p strong {
+    color: #f39c12; /* Emas */
+    font-size: 1.2rem; /* Sedikit lebih besar */
+}
+
 
 /* Gunakan style fitur dari index.css tapi buat read-only */
 /* (Copy paste bagian .elo-section, .stats-section, dll. dari index.css) */
@@ -149,11 +182,44 @@
 #result-details #main-result { text-align: center; font-size: 1.1rem; line-height: 1.7; margin-bottom: 25px; color: #e2e8f0; }
 #result-details .prob-group { margin-bottom: 15px; }
 #result-details .prob-group h4 { margin: 0 0 10px 0; color: #cbd5e1; font-weight: 600; font-size: 1rem; }
-#result-details .prob-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; }
+#result-details .prob-item {
+    display: flex;
+    flex-wrap: nowrap; /* Izinkan wrap di layar kecil */
+    align-items: center;
+    gap: 6px 10px; /* Jarak vertikal 6px, horizontal 10px */
+    margin-bottom: 10px; /* Jarak antar item */
+}
+
+#result-details .prob-label { /* Label (Home, Draw, ...) */
+    width: 80px; 
+    color: var(--muted);
+    flex-shrink: 0;
+    font-size: 0.9rem; 
+}
 #result-details .prob-item span:first-child { width: 110px; color: var(--muted); flex-shrink: 0; } /* Lebar label */
 #result-details .prob-item span:last-child { width: 50px; font-weight: 600; flex-shrink: 0; color: #e2e8f0; } /* Persentase */
-#result-details .prob-bar { flex-grow: 1; height: 16px; background-color: #1e293b; border-radius: 8px; overflow: hidden; border: 1px solid #334155; } /* Bar lebih gelap */
-#result-details .bar { height: 100%; width: 0%; border-radius: 8px; }
+#result-details .prob-bar { /* Latar belakang bar */
+    flex-grow: 1; /* Isi ruang */
+    height: 16px; /* Tinggi bar di history */
+    background-color: #1e293b; 
+    border-radius: 8px; /* Setengah dari height */
+    overflow: hidden; 
+    border: 1px solid #334155; 
+    min-width: 70px; /* Lebar minimum bar */
+}
+#result-details .bar { /* Bar yang diisi */
+    height: 100%;
+    width: 0%; 
+    border-radius: 8px; /* Samakan radius */
+}
+
+#result-details .prob-percent { /* Persentase */
+    width: 50px;
+    font-weight: 600;
+    flex-shrink: 0;
+    text-align: right; /* Ratakan kanan di mobile */
+    font-size: 0.9rem; 
+}
 
 
 /* Responsif */
@@ -172,5 +238,20 @@
 @media (max-width: 500px) {
     .history-grid { grid-template-columns: 1fr; }
     .stats-grid, .elo-section .grid { grid-template-columns: 1fr; } /* Detail fitur jadi 1 kolom */
-    #result-details .prob-item span:first-child { width: 90px; } /* Label bar lebih kecil */
+}
+
+@media (min-width: 768px) {
+    #result-details .prob-item {
+        flex-wrap: nowrap; /* Jangan wrap di desktop */
+    }
+    
+    #result-details .prob-label {
+        width: 110px; /* Lebar label di desktop */
+        font-size: 0.9rem; 
+    }
+    
+    #result-details .prob-percent {
+         text-align: left; /* Ratakan kiri di desktop */
+         font-size: 0.9rem;
+    }
 }

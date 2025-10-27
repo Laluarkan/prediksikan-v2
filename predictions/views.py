@@ -299,22 +299,27 @@ def api_predict(request):
             ai_explanation = "Tidak dapat memuat penjelasan AI saat ini."
 
     # --- 3. Simpan Riwayat ---
-    add_prediction_to_history(
-        user=request.user,
+
+    new_history_obj = add_prediction_to_history(
+        user=request.user, 
         prediction_dict={
-            'league': league,
-            'home_team': home_team,
-            'away_team': away_team,
-            'prediction': ml_result # Hasil prediksi ML
+            'league': league, 
+            'home_team': home_team, 
+            'away_team': away_team, 
+            'prediction': ml_result
         },
-        input_features=features # Fitur input dari request
+        input_features=features
     )
+    
+    # Ambil ID dari objek yang baru dibuat
+    new_history_id = new_history_obj.id if new_history_obj else None
 
     # --- 4. Kirim Respons ---
     return JsonResponse({
         'status': 'ok',
         'prediction': ml_result,
-        'explanation': ai_explanation # Penjelasan dari Gemini (atau pesan error)
+        'explanation': ai_explanation, # Penjelasan dari Gemini (atau pesan error)
+        'history_id': new_history_id
     })
 # ▲▲▲ AKHIR PERUBAHAN API PREDICT ▲▲▲
 
@@ -403,3 +408,34 @@ def api_save_new_matches(request):
         df_combined.to_csv(path, index=False)
         return JsonResponse({'status': 'ok', 'message': 'Pertandingan baru berhasil disimpan'})
     except Exception as e: return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@csrf_exempt
+@require_POST
+@login_required
+def api_save_choice(request):
+    """ Menerima pilihan user (HDA/OU/BTTS) dan menyimpannya ke database. """
+    try:
+        body = json.loads(request.body)
+        history_id = body.get('id')
+        choice_type = body.get('type') # HDA, OU, atau BTTS
+        choice_value = body.get('value') # H, D, A, Over, Under, Yes, No
+        
+        history = PredictionHistory.objects.get(id=history_id, user=request.user)
+        
+        # Update kolom sesuai pilihan
+        if choice_type == 'HDA':
+            history.hda_chosen = choice_value
+        elif choice_type == 'OU':
+            history.over_under_chosen = choice_value
+        elif choice_type == 'BTTS':
+            history.btts_chosen = choice_value
+            
+        history.is_preferred_choice = True # Asumsikan pilihan ini yang terbaik
+        history.save()
+        
+        return JsonResponse({'status': 'ok', 'message': f'Pilihan {choice_type} ({choice_value}) berhasil disimpan sebagai pilihan terbaik.'})
+        
+    except PredictionHistory.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Riwayat tidak ditemukan atau bukan milik Anda.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Gagal menyimpan pilihan: {str(e)}'}, status=500)

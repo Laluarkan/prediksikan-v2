@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load dict_filters %} {# Muat filter kustom kita #}
+{% load dict_filters %}
+{% load tz %}
 
 {% block page_styles %}
   <link rel="stylesheet" href="{% static 'css/history.css' %}">
@@ -30,13 +31,26 @@
            class="hist-item-link {% if selected_history and selected_history.id == item.id %}selected{% endif %}">
           <strong>{{ item.league }}</strong>
           <span class="hist-match">{{ item.home_team }} vs {{ item.away_team }}</span>
-          <small>{{ item.timestamp|date:"d-m-Y H:i" }}</small>
+          
+          <small>{{ item.timestamp|timezone:"Asia/Makassar"|date:"d-m-Y H:i" }} WITA</small>
+          
           <span class="hist-preds">
-            HDA: {{ item.prediction_data.HDA.label|default:'-' }} |
+            Model: {{ item.prediction_data.HDA.label|default:'-' }} |
             OU: {{ item.prediction_data.OU25.label|default:'-' }} |
             BTTS: {{ item.prediction_data.BTTS.label|default:'-' }}
           </span>
-        </a>
+          
+          {% if item.is_preferred_choice %}
+            {% if item.hda_chosen != 'N' or item.over_under_chosen != 'N' or item.btts_chosen != 'N' %}
+              <span class="hist-user-choice">
+                ⭐ Pilihan Anda: 
+                {% if item.hda_chosen != 'N' %}{{ item.hda_chosen }} {% endif %}
+                {% if item.over_under_chosen != 'N' %}| {{ item.over_under_chosen }} {% endif %}
+                {% if item.btts_chosen != 'N' %}| {{ item.btts_chosen }}{% endif %}
+              </span>
+            {% endif %}
+          {% endif %}
+          </a>
       {% endfor %}
     </div>
   {% else %}
@@ -50,7 +64,29 @@
   {% if selected_history %}
     <div class="prediction-details">
       <h2>Detail Prediksi: {{ selected_history.home_team }} vs {{ selected_history.away_team }}</h2>
-      <p style="text-align:center; margin-top:-20px; margin-bottom:30px; color:var(--muted);">Prediksi pada: {{ selected_history.timestamp|date:"d F Y H:i" }}</p>
+      
+      <p style="text-align:center; margin-top:-20px; margin-bottom:30px; color:var(--muted);">
+          Prediksi pada: {{ selected_history.timestamp|timezone:"Asia/Makassar"|date:"d F Y H:i" }} WITA
+      </p>
+
+      {% if selected_history.is_preferred_choice %}
+        {% if selected_history.hda_chosen != 'N' or selected_history.over_under_chosen != 'N' or selected_history.btts_chosen != 'N' %}
+          <div class="user-choices-detail">
+              <h3>⭐ Pilihan Terbaik Anda</h3>
+              <p>
+                  {% if selected_history.hda_chosen != 'N' %}
+                      <span>H/D/A: <strong>{{ selected_history.hda_chosen }}</strong></span>
+                  {% endif %}
+                  {% if selected_history.over_under_chosen != 'N' %}
+                      <span>O/U 2.5: <strong>{{ selected_history.over_under_chosen }}</strong></span>
+                  {% endif %}
+                  {% if selected_history.btts_chosen != 'N' %}
+                      <span>BTTS: <strong>{{ selected_history.btts_chosen }}</strong></span>
+                  {% endif %}
+              </p>
+          </div>
+        {% endif %}
+      {% endif %}
 
       {% with features=selected_history.input_features %}
         {% if features %}

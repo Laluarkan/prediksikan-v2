@@ -191,6 +191,41 @@
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 <script>
+window.handleChoiceClick = async function(historyId, choiceType, choiceValue) {
+    // Ambil token CSRF di sini karena fungsi ini global
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    
+    // Cek ID di sini
+    if (!historyId) {
+        alert('Fitur ini memerlukan login. Silakan login untuk menyimpan pilihan Anda.');
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/save_choice', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ 
+                id: historyId, 
+                type: choiceType, 
+                value: choiceValue 
+            })
+        });
+
+        const data = await res.json();
+        if (data.status === 'ok') {
+            alert(`Pilihan ${choiceType}: ${choiceValue} berhasil disimpan sebagai pilihan terbaik!`);
+        } else {
+            alert(`Gagal menyimpan pilihan: ${data.message}`);
+        }
+    } catch (err) {
+        alert(`Terjadi error koneksi: ${err.message}`);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     
     const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
@@ -211,6 +246,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // ▲▲▲ AKHIR TAMBAHAN ▲▲▲
 
     let currentFeatures = null;
+    let lastHistoryId = null;
+
+    function renderProbBlockWithButtons(title, probs, type) {
+        if (!probs) return '';
+        let html = `<div class="prob-group"><h4>${title}</h4>`;
+        for (const [label, val] of Object.entries(probs)) {
+             const percent = (val * 100).toFixed(1);
+             const gradient = getGradientColor(percent);
+             
+             let buttonHTML = '';
+             // Tombol SELALU ditampilkan
+             // 'lastHistoryId' bisa null, dan akan ditangani oleh handleChoiceClick
+             buttonHTML = `
+                <div style="flex-shrink:0; width: 100px; margin-left: 15px;"> 
+                    <button class="btn small" 
+                       onclick="window.handleChoiceClick(${lastHistoryId}, '${type}', '${label}')">Pilih Ini</button>
+                </div>`;
+             
+             html += `
+             <div class="prob-item">
+                 <span>${label}</span>
+                 <div class="prob-bar"><div class="bar" style="width:${percent}%; background:${gradient}"></div></div>
+                 <span>${percent}%</span>
+                 ${buttonHTML}
+             </div>`;
+        }
+        html += `</div>`;
+        return html;
+    }
 
     // Inisialisasi Choices.js
     const leagueChoice = new Choices(leagueEl, {
@@ -387,6 +451,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return; 
         }
 
+        lastHistoryId = json.history_id || null;
+
         const p = json.prediction;
         const mainResultHTML = `
             <div class="result-title">📊 Hasil Prediksi</div>
@@ -396,9 +462,9 @@ document.addEventListener('DOMContentLoaded', () => {
               🤝 (BTTS): <b>${p.BTTS?.label || '-'}</b>
             </div>
             <div id="prob-bars" class="prob-section">
-              ${renderProbBlock('🏠 (Home / Draw / Away)', p.HDA?.probs)}
-              ${renderProbBlock('⚽ Over / Under 2.5', p.OU25?.probs)}
-              ${renderProbBlock('🤝 Both Team To Score', p.BTTS?.probs)}
+              ${renderProbBlockWithButtons('🏠 (Home / Draw / Away)', p.HDA?.probs, 'HDA')}
+              ${renderProbBlockWithButtons('⚽ Over / Under 2.5', p.OU25?.probs, 'OU')}
+              ${renderProbBlockWithButtons('🤝 Both Team To Score', p.BTTS?.probs, 'BTTS')}
             </div>
         `;
         
