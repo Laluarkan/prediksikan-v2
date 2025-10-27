@@ -33,11 +33,14 @@ INITIAL_ELO = 1500
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
-    'https://prediksi-kan-1.onrender.com',  # Mengizinkan subdomain Render Anda
+    'prediksi-kan-1.onrender.com',  # Mengizinkan subdomain Render Anda
     '127.0.0.1',      # Tetap izinkan localhost
     'localhost'
 ] # Sesuaikan untuk produksi (Render akan mengaturnya)
-CSRF_TRUSTED_ORIGINS = ['https://prediksi-kan-1.onrender.com'] # Sesuaikan untuk Render
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',                 # Wildcard
+    'https://prediksi-kan-1.onrender.com'  # <-- TAMBAHKAN DOMAIN LENGKAP
+]
 
 
 # Application definition
