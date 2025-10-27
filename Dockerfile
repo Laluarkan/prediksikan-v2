@@ -27,9 +27,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 7. Kumpulkan file statis
 RUN python manage.py collectstatic --noinput
 
-# 8. Port yang akan diekspos
-EXPOSE 8000
-
 # 9. Perintah default untuk menjalankan server
 # (Kita akan override ini di Render untuk menambahkan migrasi)
-CMD ["gunicorn", "football_project.wsgi", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "football_project.wsgi", "--bind", "0.0.0.0:$PORT"]
