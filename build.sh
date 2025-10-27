@@ -2,6 +2,9 @@
 # Exit on error
 set -o errexit
 
+echo "Installing system dependencies..."
+apt-get update && apt-get install -y git-lfs
+
 echo "Installing requirements..."
 pip install -r requirements.txt
 
