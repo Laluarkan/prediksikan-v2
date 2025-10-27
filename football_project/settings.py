@@ -35,7 +35,8 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     'prediksi-kan-1.onrender.com',  # Mengizinkan subdomain Render Anda
     '127.0.0.1',      # Tetap izinkan localhost
-    'localhost'
+    'localhost', 
+    '.onrender.com'
 ] # Sesuaikan untuk produksi (Render akan mengaturnya)
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',                 # Wildcard
