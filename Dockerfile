@@ -29,4 +29,4 @@ RUN python manage.py collectstatic --noinput
 
 # 9. Perintah default untuk menjalankan server
 # (Kita akan override ini di Render untuk menambahkan migrasi)
-CMD ["gunicorn", "football_project.wsgi", "--bind", "0.0.0.0:$PORT"]
+CMD sh -c "gunicorn football_project.wsgi --bind 0.0.0.0:${PORT:-8000}"
