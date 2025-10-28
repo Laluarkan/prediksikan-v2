@@ -5,11 +5,6 @@
 {% block page_styles %}
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
   <link rel="manifest" href="{% static 'manifest.json' %}"> 
-    {# Catatan: Django-PWA membuat manifest.json secara otomatis di root URL /manifest.json #}
-    {# Namun, tag ini sering membantu browser dalam menemukannya. #}
-    {# Alternatif: <link rel="manifest" href="/manifest.json"> #}
-    {# URL yang benar di Django-PWA adalah '/manifest.json' #}
-    <link rel="manifest" href="/manifest.json">
 {% endblock %}
 
 
@@ -22,11 +17,7 @@
   <header class="hero">
     <h1>Selamat datang di Prediksi-Kan</h1>
     <p>Lihat prediksi terbaru, statistik tim, dan dukung pengembangan.</p>
-    
-      <p class="league-info">
-      🏆 Kami FOKUS pada <strong>5 Liga Elite Eropa</strong>: Premier League, La Liga, Serie A, Bundesliga, & Ligue 1.
-    </p>
-    
+       
     <div class="hero-actions">
       <a class="btn" href="{% url 'index' %}">Prediksi Sekarang</a>
       <a class="btn sawer" href="https://saweria.co/prediksikan" target="_blank">Dukung Kami</a>
@@ -67,7 +58,7 @@
           Gunakan prediksi kami sebagai wawasan berbasis data, bukan jaminan hasil akhir.
       </p>
   </section>
-  
+
   <section class="about">
   <h2>Tentang Aplikasi <strong>Prediksi-Kan</strong></h2>
   <p>
@@ -79,6 +70,23 @@
     Kami berkomitmen menghadirkan pengalaman analisis modern yang tidak hanya cepat, tetapi juga intuitif dan dapat diandalkan.
   </p>
 </section>
+
+<section class="how-it-works">
+    <h2>Daftar Liga</h2>
+    <ol>
+      <li>Liga Belanda</li>
+      <li>Liga Belgia</li>
+      <li>Liga Inggris.</li>
+      <li>Liga Itali</li>
+      <li>Liga Jerman</li>
+      <li>Liga Perancis</li>
+      <li>Liga Portugal</li>
+      <li>Liga Skotlandia</li>
+      <li>Liga Spanyol</li>
+      <li>Liga Turki</li>
+    </ol>
+    <p>Kamu juga bisa memilih <strong>All League</strong> sebagai alat untuk prediksi <strong>UCL</strong></p>
+  </section>
 
   <section class="how-it-works">
     <h2>Cara Kerja Prediksi</h2>
