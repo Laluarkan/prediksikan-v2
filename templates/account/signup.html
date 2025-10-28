@@ -1,0 +1,51 @@
+{% extends 'base_minimal.html' %}
+{% load static %}
+{% load i18n %}
+{% load allauth %}
+{% load socialaccount %} 
+
+{% block title %}Daftar | Prediksi-Kan{% endblock %}
+
+{% block page_styles %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}"> {% endblock %}
+
+{% block content %}
+<body class="login-page">
+    <div class="login-box">
+        <h2>Daftar Akun Baru</h2>
+
+        {% if form.errors %}
+            <div class="error-box">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <form class="signup-form" id="signup_form" method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="input-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-login">Daftar</button>
+            
+            <div class="divider">Atau</div>
+            <a href="{% provider_login_url 'google' %}" class="btn-google">
+                Daftar dengan Google
+            </a> 
+        </form>
+
+        <div class="links">
+            <a href="{% url 'account_login' %}">Sudah punya akun? Login</a>
+            <a href="{% url 'home' %}" class="back-link">Kembali ke Home</a>
+        </div>
+    </div>
+</body>
+{% endblock %}
