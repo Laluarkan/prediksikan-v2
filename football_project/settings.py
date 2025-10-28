@@ -121,12 +121,13 @@ AUTHENTICATION_BACKENDS = [
 # ==========================================================
 # --- Konfigurasi Allauth (DIPERBARUI UNTUK MENGHILANGKAN WARNINGS) ---
 # ==========================================================
-ACCOUNT_LOGIN_METHODS = ['email']             
-ACCOUNT_SIGNUP_FIELDS = ['email']             
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None      
-ACCOUNT_USERNAME_REQUIRED = False             
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_EMAIL_VERIFICATION = 'none' # Email sudah diverifikasi oleh Google         
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ # Email sudah diverifikasi oleh Google         
 
 # ▼▼▼ TAMBAHKAN BARIS INI ▼▼▼
 SOCIALACCOUNT_AUTO_SIGNUP = True # Otomatis signup saat login sosial pertama kali
