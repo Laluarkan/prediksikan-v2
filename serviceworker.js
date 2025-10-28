@@ -1,53 +1,62 @@
-// serviceworker.js (di root proyek)
+// serviceworker.js
 
-// Tentukan versi cache Anda
-var staticCacheName = "django-pwa-v1";
-
-// Daftar file yang akan di-cache saat instalasi
-var filesToCache = [
-    '/',
-    '/index/',
-    '/static/css/style.css',
-    '/static/css/home.css',
-    '/static/css/index.css',
-    '/static/images/prediksikan-logo.png', // Tambahkan ikon utama Anda
-    // Tambahkan URL file JS penting lainnya jika ada
+const CACHE_NAME = "prediksi-kan-cache-v1";
+const urlsToCache = [
+  "/",
+  "/index/",
+  "/static/css/style.css",
+  "/static/css/home.css",
+  "/static/css/index.css",
+  "/static/images/prediksikan-logo1.png",
 ];
 
-// Event Install: Menyimpan aset statis
-self.addEventListener('install', function (e) {
-    e.waitUntil(
-        caches.open(staticCacheName).then(function (cache) {
-            return cache.addAll(filesToCache);
-        })
-    );
+// Saat instalasi: cache file statis
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache);
+    })
+  );
+  self.skipWaiting();
 });
 
-// Event Activate: Membersihkan cache lama
-self.addEventListener('activate', function (e) {
-    e.waitUntil(
-        caches.keys().then(function (cacheNames) {
-            return Promise.all(
-                cacheNames.filter(function (cacheName) {
-                    return cacheName.startsWith('django-pwa-') && cacheName !== staticCacheName;
-                }).map(function (cacheName) {
-                    return caches.delete(cacheName);
-                })
-            );
+// Saat aktivasi: hapus cache lama
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((name) => {
+          if (name !== CACHE_NAME) {
+            return caches.delete(name);
+          }
         })
-    );
+      );
+    })
+  );
+  self.clients.claim();
 });
 
-// Event Fetch: Mengambil dari cache jika ada, jika tidak, ambil dari jaringan
-self.addEventListener('fetch', function (e) {
-    // Abaikan permintaan yang bukan HTTP/HTTPS (misal ekstensi Chrome)
-    if (!e.request.url.startsWith('http')) {
-        return;
-    }
+// Saat fetch: hanya intercept request ke domain sendiri
+self.addEventListener("fetch", (event) => {
+  const reqUrl = new URL(event.request.url);
 
-    e.respondWith(
-        caches.match(e.request).then(function (response) {
-            return response || fetch(e.request);
+  // Batasi hanya untuk domain ini (hindari phishing detection)
+  if (reqUrl.origin !== self.location.origin) {
+    return; // Biarkan request eksternal lewat langsung
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      // Ambil dari cache kalau ada, jika tidak ambil dari jaringan
+      return (
+        response ||
+        fetch(event.request).catch(() => {
+          // Jika offline dan tidak ada di cache, kembalikan halaman fallback
+          if (event.request.mode === "navigate") {
+            return caches.match("/");
+          }
         })
-    );
+      );
+    })
+  );
 });
