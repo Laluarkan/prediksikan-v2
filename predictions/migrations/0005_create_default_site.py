@@ -28,7 +28,8 @@ def remove_site(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [      
-        # Migrasi ini juga bergantung pada migrasi bawaan 'sites'
+        ('predictions', '0004_predictionhistory_btts_chosen_and_more'), 
+        # ▲▲▲ -------------------- ▲▲▲
         ('sites', '0002_alter_domain_unique'), 
     ]
 
