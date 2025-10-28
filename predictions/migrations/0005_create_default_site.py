@@ -27,11 +27,7 @@ def remove_site(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        # ▼▼▼ GANTI INI dengan nama file migrasi terakhir Anda dari Langkah 2 ▼▼▼
-        ('predictions', '0005_create_default_site'), 
-        # ▲▲▲ -------------------------------------------------------- ▲▲▲
-        
+    dependencies = [      
         # Migrasi ini juga bergantung pada migrasi bawaan 'sites'
         ('sites', '0002_alter_domain_unique'), 
     ]
