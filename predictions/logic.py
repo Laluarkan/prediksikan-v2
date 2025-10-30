@@ -7,7 +7,7 @@ import joblib
 import glob
 import functools
 from datetime import datetime, timezone
-
+from django.db.models import Q
 from django.conf import settings
 from .models import PredictionHistory 
 
@@ -278,3 +278,67 @@ def update_elo_and_features(df_existing, df_new, window=5, K=30, initial_elo=INI
             row_full.update({'HomeTeamElo':h_elo_new,'AwayTeamElo':a_elo_new,'EloDifference':h_elo_new-a_elo_new,'Home_AvgGoalsScored':home_stats['AvgGoalsScored'],'Home_AvgGoalsConceded':home_stats['AvgGoalsConceded'],'Home_Wins':home_stats['Wins'],'Home_Draws':home_stats['Draws'],'Home_Losses':home_stats['Losses'],'Away_AvgGoalsScored':away_stats['AvgGoalsScored'],'Away_AvgGoalsConceded':away_stats['AvgGoalsConceded'],'Away_Wins':away_stats['Wins'],'Away_Draws':away_stats['Draws'],'Away_Losses':away_stats['Losses'],'HTH_HomeWins':hth_home_wins,'HTH_AwayWins':hth_away_wins,'HTH_Draws':hth_draws,'HTH_AvgHomeGoals':hth_avg_home_goals,'HTH_AvgAwayGoals':hth_avg_away_goals,**odds_values})
             new_rows.append(row_full)
     return pd.DataFrame(new_rows)
+
+def check_prediction_results(new_matches_df):
+    """
+    Menerima DataFrame dari pertandingan yang baru di-upload (dengan hasil),
+    mencari prediksi user yang relevan di database, dan menandai
+    apakah tebakan mereka benar (W) atau salah (L).
+    """
+    print(f"🔄 Memulai pengecekan {len(new_matches_df)} hasil pertandingan...")
+    updated_count = 0
+
+    # Pastikan kolom hasil ada (FTHG, FTAG, FTR)
+    required_cols = ['HomeTeam', 'AwayTeam', 'FTR', 'FTHG', 'FTAG']
+    if not all(col in new_matches_df.columns for col in required_cols):
+        print("❌ Pengecekan hasil dibatalkan: DataFrame kekurangan kolom hasil (FTHG/FTAG/FTR).")
+        return 0
+
+    # Loop melalui setiap pertandingan yang baru diselesaikan dari CSV
+    for index, row in new_matches_df.iterrows():
+        home_team = row['HomeTeam']
+        away_team = row['AwayTeam']
+        
+        # Tentukan hasil sebenarnya dari data CSV
+        actual_ftr = row['FTR']
+        actual_ou = 'Over' if (row['FTHG'] + row['FTAG']) > 2.5 else 'Under'
+        actual_btts = 'Yes' if (row['FTHG'] > 0 and row['FTAG'] > 0) else 'No'
+
+        # Cari semua prediksi di database yang belum selesai untuk pertandingan ini
+        pending_predictions = PredictionHistory.objects.filter(
+            home_team=home_team,
+            away_team=away_team,
+            is_match_completed=False,
+            is_preferred_choice=True # Hanya cek jika user membuat pilihan
+        )
+        
+        # Jika tidak ada yang menebak pertandingan ini, lanjutkan
+        if not pending_predictions.exists():
+            continue
+
+        # Update semua prediksi yang ditemukan
+        for pred in pending_predictions:
+            # 1. Cek HDA
+            if pred.hda_chosen == actual_ftr:
+                pred.hda_result = 'W' # Win
+            elif pred.hda_chosen != 'N':
+                pred.hda_result = 'L' # Lose
+            
+            # 2. Cek O/U
+            if pred.over_under_chosen == actual_ou:
+                pred.ou_result = 'W'
+            elif pred.over_under_chosen != 'N':
+                pred.ou_result = 'L'
+
+            # 3. Cek BTTS
+            if pred.btts_chosen == actual_btts:
+                pred.btts_result = 'W'
+            elif pred.btts_chosen != 'N':
+                pred.btts_result = 'L'
+
+            pred.is_match_completed = True
+            pred.save()
+            updated_count += 1
+
+    print(f"✅ Pengecekan selesai. {updated_count} tebakan pengguna telah diperbarui.")
+    return updated_count

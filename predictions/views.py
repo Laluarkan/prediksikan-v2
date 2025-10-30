@@ -14,7 +14,7 @@ from django.conf import settings
 import google.generativeai as genai
 import traceback # <<< TAMBAHKAN IMPORT INI
 import math # <<< TAMBAHKAN IMPORT INI
-
+from django.db.models import Q
 from .models import PredictionHistory
 from .decorators import admin_required
 from .logic import * 
@@ -40,7 +40,47 @@ except Exception as e:
 # ==========================================================
 
 def home_page(request):
-    return render(request, 'home.html')
+    context = {}
+    
+    # Jika user login, hitung win rate mereka
+    if request.user.is_authenticated:
+        # Hanya hitung tebakan yang sudah selesai (is_match_completed=True)
+        # dan di mana user membuat pilihan (is_preferred_choice=True)
+        user_preds = PredictionHistory.objects.filter(
+            user=request.user, 
+            is_match_completed=True,
+            is_preferred_choice=True
+        )
+        
+        total_bets = 0
+        total_wins = 0
+        
+        # Hitung HDA
+        hda_bets = user_preds.exclude(hda_chosen='N').count()
+        hda_wins = user_preds.filter(hda_result='W').count()
+        
+        # Hitung O/U
+        ou_bets = user_preds.exclude(over_under_chosen='N').count()
+        ou_wins = user_preds.filter(ou_result='W').count()
+        
+        # Hitung BTTS
+        btts_bets = user_preds.exclude(btts_chosen='N').count()
+        btts_wins = user_preds.filter(btts_result='W').count()
+        
+        total_bets = hda_bets + ou_bets + btts_bets
+        total_wins = hda_wins + ou_wins + btts_wins
+        
+        win_rate = 0
+        if total_bets > 0:
+            win_rate = (total_wins / total_bets) * 100
+            
+        context['win_rate_stats'] = {
+            'total_bets': total_bets,
+            'total_wins': total_wins,
+            'win_rate': win_rate
+        }
+
+    return render(request, 'home.html', context)
 
 def index(request):
     leagues = list_leagues()
@@ -425,6 +465,8 @@ def api_upload_csv(request):
 
         # 7. Hitung fitur (Elo, Stats, H2H) menggunakan logic.py
         df_new_full = update_elo_and_features(df_existing, df_new_only)
+
+        check_prediction_results(df_new_full)
         
         # 8. Format output untuk ditampilkan di tabel
         df_output = df_new_full.copy()

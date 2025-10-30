@@ -17,12 +17,33 @@
   <header class="hero">
     <h1>Selamat datang di Prediksi-Kan</h1>
     <p>Lihat prediksi terbaru, statistik tim, dan dukung pengembangan.</p>
-       
+    <p>Data pertandingan akan di perbarui setiap akhir match mingguan tiap liga, biasanya pada hari rabu</p>   
     <div class="hero-actions">
       <a class="btn" href="{% url 'index' %}">Prediksi Sekarang</a>
       <a class="btn sawer" href="https://saweria.co/prediksikan" target="_blank">Dukung Kami</a>
     </div>
   </header>
+
+  {% if user.is_authenticated and win_rate_stats %}
+    <section class="win-rate-card">
+        <h2>📊 Win Rate Pilihan Anda</h2>
+        {% if win_rate_stats.total_bets > 0 %}
+            <p>Anda telah membuat <strong>{{ win_rate_stats.total_bets }}</strong> tebakan pada pertandingan yang telah selesai.</p>
+            <div class="win-rate-display">
+                <div class="win-rate-value">{{ win_rate_stats.win_rate|floatformat:1 }}<span>%</span></div>
+                <div class="win-rate-detail">
+                    (<strong>{{ win_rate_stats.total_wins }}</strong> Tebakan Benar)
+                </div>
+            </div>
+        {% else %}
+            <p>Statistik Win Rate Anda masih kosong.</p>
+            <p>
+                Mulai buat prediksi dan pilih tebakan terbaik Anda di halaman <strong>Prediksi</strong>. 
+                Hasil dan Win Rate Anda akan muncul di sini setelah data pertandingan terbaru diunggah oleh Admin.
+            </p>
+        {% endif %}
+    </section>
+  {% endif %}
 
   <section class="suggestion-link">
       <p>Punya ide fitur atau menemukan *bug*? Bantu kami jadi lebih baik!</p>

@@ -53,6 +53,16 @@ class PredictionHistory(models.Model):
     btts_chosen = models.CharField(max_length=3, default='N') # Yes, No, atau N
     # ▲▲▲ AKHIR TAMBAHAN ▼▼▼
 
+    # ▼▼▼ TAMBAHKAN KOLOM BARU UNTUK HASIL ▼▼▼
+    # Status apakah pertandingan sudah selesai (berdasarkan upload CSV baru)
+    is_match_completed = models.BooleanField(default=False)
+    
+    # Hasil tebakan user (W = Win, L = Lose, N/A = Not Played/Not Checked)
+    hda_result = models.CharField(max_length=3, default='N/A')
+    ou_result = models.CharField(max_length=3, default='N/A')
+    btts_result = models.CharField(max_length=3, default='N/A')
+    # ▲▲▲ AKHIR TAMBAHAN ▼▼▲
+
     def __str__(self):
         return f"{self.user.email} - {self.home_team} vs {self.away_team}"
 
