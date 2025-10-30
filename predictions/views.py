@@ -323,7 +323,7 @@ def api_predict(request):
 @login_required
 def api_history(request):
     # Ambil 10 riwayat terbaru untuk halaman riwayat
-    histories_query = PredictionHistory.objects.filter(user=request.user).order_by('-timestamp')[:10] 
+    histories_query = PredictionHistory.objects.filter(user=request.user).order_by('-timestamp')[:20] 
     
     history_list = []
     for item in histories_query:
