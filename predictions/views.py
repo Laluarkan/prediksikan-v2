@@ -338,9 +338,10 @@ def api_predict(request):
             'league': league, 
             'home_team': home_team, 
             'away_team': away_team, 
-            'prediction': ml_result
+            'prediction': ml_result,
         },
-        input_features=features
+        input_features=features,
+        ai_explanation=ai_explanation
     )
     
     # Ambil ID dari objek yang baru dibuat
@@ -350,7 +351,6 @@ def api_predict(request):
     return JsonResponse({
         'status': 'ok',
         'prediction': ml_result,
-        'explanation': ai_explanation, # Penjelasan dari Gemini (atau pesan error)
         'history_id': new_history_id
     })
 # ▲▲▲ AKHIR PERUBAHAN API PREDICT ▲▲▲

@@ -88,6 +88,13 @@
         {% endif %}
       {% endif %}
 
+      {% if selected_history.ai_explanation %}
+        <div class="ai-explanation-box">
+            <h3>🤖 Analisis AI</h3>
+            <p>{{ selected_history.ai_explanation|linebreaksbr }}</p>
+        </div>
+      {% endif %}
+
       {% with features=selected_history.input_features %}
         {% if features %}
           {# Bagian ELO (tidak berubah) #}

@@ -63,6 +63,8 @@ class PredictionHistory(models.Model):
     btts_result = models.CharField(max_length=3, default='N/A')
     # ▲▲▲ AKHIR TAMBAHAN ▼▼▲
 
+    ai_explanation = models.TextField(blank=True, null=True)
+
     def __str__(self):
         return f"{self.user.email} - {self.home_team} vs {self.away_team}"
 
