@@ -61,7 +61,7 @@ def add_data_page(request):
 @login_required
 def history_page(request, history_id=None):
     # Ambil 10 riwayat terbaru untuk grid atas
-    latest_histories = PredictionHistory.objects.filter(user=request.user).order_by('-timestamp')[:10]
+    latest_histories = PredictionHistory.objects.filter(user=request.user).order_by('-timestamp')[:20]
     
     selected_history = None
     if history_id:
@@ -273,10 +273,6 @@ def api_predict(request):
             berdasarkan perbedaan kekuatan tim, tren gol, dan performa terkini.
             Gunakan gaya analisis alami seperti komentator sepak bola profesional.
             Hindari kata-kata pasti seperti "pasti menang" atau "sudah pasti".
-            Contoh: 
-            - "{home_team} tampil lebih konsisten di kandang dan unggul secara Elo, mendukung prediksi kemenangan mereka."
-            - "Kedua tim sama kuat secara performa, sehingga hasil imbang cukup masuk akal."
-            - "Pertandingan berpotensi menghasilkan banyak gol karena kedua tim memiliki produktivitas tinggi baru-baru ini."
             """
 
             print(f"\n--- Prompt Gemini untuk {home_team} vs {away_team} ---")
