@@ -1,1 +1,1 @@
-web: gunicorn football_project.wsgi --bind 0.0.0.0:$PORT
+web: gunicorn football_project.wsgi --bind 0.0.0.0:$PORT --timeout 60
