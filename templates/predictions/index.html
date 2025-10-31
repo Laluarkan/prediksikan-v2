@@ -480,15 +480,12 @@ document.addEventListener('DOMContentLoaded', () => {
         animateBars(); 
 
         // Tampilkan Penjelasan AI 
-        if (aiExplanationEl && aiExplanationContainer) {
-            // Cek apakah user login (history_id hanya ada jika login)
-            if (lastHistoryId) {
-                // Buat link ke halaman riwayat
-                aiExplanationEl.innerHTML = `Analisis AI telah disimpan. <a href="/history/${lastHistoryId}/" style="color: var(--accent); font-weight: 600;">Lihat di Riwayat Prediksi Anda</a>.`;
-            } else {
-                aiExplanationEl.innerHTML = `<i>Login untuk menyimpan analisis AI dan melihatnya di halaman riwayat.</i>`;
-            }
+        if (json.explanation && aiExplanationEl && aiExplanationContainer) {
+            aiExplanationEl.textContent = json.explanation; 
             aiExplanationContainer.classList.remove('hidden'); 
+        } else if(aiExplanationEl && aiExplanationContainer) {
+             aiExplanationEl.textContent = 'Penjelasan AI tidak tersedia.'; 
+             aiExplanationContainer.classList.remove('hidden'); 
         }
     }
     

@@ -141,7 +141,7 @@ def compute_features_all_leagues(home_team, away_team, window=5):
 
 # ▼▼▼ PERBARUI FUNGSI INI ▼▼▼
 # Tambahkan parameter 'input_features'
-def add_prediction_to_history(user, prediction_dict, input_features=None, ai_explanation=None):
+def add_prediction_to_history(user, prediction_dict, input_features=None):
     if not user.is_authenticated:
         return None 
     try:
@@ -151,8 +151,7 @@ def add_prediction_to_history(user, prediction_dict, input_features=None, ai_exp
             home_team=prediction_dict.get('home_team'),
             away_team=prediction_dict.get('away_team'),
             prediction_data=prediction_dict.get('prediction'),
-            input_features= input_features,
-            ai_explanation=ai_explanation  # <-- Simpan penjelasan AI
+            input_features= input_features
         )
         return new_history  # <<< KEMBALIKAN OBJEK YANG BARU DIBUAT
     except Exception as e:

@@ -28,7 +28,7 @@ try:
     else:
         genai.configure(api_key=GOOGLE_API_KEY)
         # Ganti 'gemini-pro' jika Anda menggunakan model lain
-        gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+        gemini_model = genai.GenerativeModel('gemini-2.5-flash-lite')
         print("\033[92mGoogle AI (Gemini) berhasil dikonfigurasi.\033[0m")
 except Exception as e:
     print(f"\033[91mERROR: Gagal mengkonfigurasi Google AI: {e}\033[0m")
@@ -341,7 +341,6 @@ def api_predict(request):
             'prediction': ml_result,
         },
         input_features=features,
-        ai_explanation=ai_explanation
     )
     
     # Ambil ID dari objek yang baru dibuat
@@ -351,6 +350,7 @@ def api_predict(request):
     return JsonResponse({
         'status': 'ok',
         'prediction': ml_result,
+        'explanation': ai_explanation,
         'history_id': new_history_id
     })
 # ▲▲▲ AKHIR PERUBAHAN API PREDICT ▲▲▲
