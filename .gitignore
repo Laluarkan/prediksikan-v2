@@ -12,3 +12,5 @@ staticfiles/
 
 # File media (jika Anda punya upload gambar)
 media/
+
+test.py
