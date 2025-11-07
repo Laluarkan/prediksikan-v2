@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} - Prediksi-Kan{% endblock %}
+{% block meta_description %}{{ article.meta_description|default:article.excerpt }}{% endblock %}
+
+{% block page_styles %}
+    <link rel="stylesheet" href="{% static 'css/article.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="article-container">
+    <article class="article-content">
+        <h1>{{ article.title }}</h1>
+        <p class="article-meta">
+            Oleh <strong>{{ article.author.first_name|default:article.author.email }}</strong> | 
+            Dipublikasikan pada: {{ article.created_on|date:"d F Y" }}
+        </p>
+
+        <div class="article-body">
+            {{ article.content|linebreaks }}
+        </div>
+    </article>
+</div>
+{% endblock %}

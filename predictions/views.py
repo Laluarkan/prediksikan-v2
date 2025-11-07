@@ -18,6 +18,7 @@ from django.db.models import Q
 from .models import PredictionHistory
 from .decorators import admin_required
 from .logic import * 
+from .models import PredictionHistory, CustomUser, Article
 
 # ▼▼▼ Konfigurasi Google AI ▼▼▼
 try:
@@ -42,38 +43,30 @@ except Exception as e:
 def home_page(request):
     context = {}
     
+    # Ambil 3 artikel terbaru yang sudah 'published'
+    latest_articles = Article.objects.filter(status='published').order_by('-created_on')[:3]
+    context['latest_articles'] = latest_articles
+    
     # Jika user login, hitung win rate mereka
     if request.user.is_authenticated:
-        # Hanya hitung tebakan yang sudah selesai (is_match_completed=True)
-        # dan di mana user membuat pilihan (is_preferred_choice=True)
         user_preds = PredictionHistory.objects.filter(
             user=request.user, 
             is_match_completed=True,
             is_preferred_choice=True
         )
-        
         total_bets = 0
         total_wins = 0
-        
-        # Hitung HDA
         hda_bets = user_preds.exclude(hda_chosen='N').count()
         hda_wins = user_preds.filter(hda_result='W').count()
-        
-        # Hitung O/U
         ou_bets = user_preds.exclude(over_under_chosen='N').count()
         ou_wins = user_preds.filter(ou_result='W').count()
-        
-        # Hitung BTTS
         btts_bets = user_preds.exclude(btts_chosen='N').count()
         btts_wins = user_preds.filter(btts_result='W').count()
-        
         total_bets = hda_bets + ou_bets + btts_bets
         total_wins = hda_wins + ou_wins + btts_wins
-        
         win_rate = 0
         if total_bets > 0:
             win_rate = (total_wins / total_bets) * 100
-            
         context['win_rate_stats'] = {
             'total_bets': total_bets,
             'total_wins': total_wins,
@@ -81,6 +74,27 @@ def home_page(request):
         }
 
     return render(request, 'home.html', context)
+
+def article_list_page(request):
+    """
+    Menampilkan semua artikel yang sudah 'published'.
+    """
+    articles = Article.objects.filter(status='published').order_by('-created_on')
+    context = {
+        'articles': articles
+    }
+    return render(request, 'predictions/article_list.html', context)
+
+
+def article_detail_page(request, slug):
+    """
+    Menampilkan satu artikel berdasarkan slug-nya.
+    """
+    article = get_object_or_404(Article, slug=slug, status='published')
+    context = {
+        'article': article
+    }
+    return render(request, 'predictions/article_detail.html', context)
 
 def index(request):
     leagues = list_leagues()

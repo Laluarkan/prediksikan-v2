@@ -18,13 +18,15 @@ urlpatterns = [
     path('api/teams', views.api_teams, name='api_teams'),
     path('api/features', views.api_features, name='api_features'),
     path('api/predict', views.api_predict, name='api_predict'),
-    
-    # ▼▼▼ TAMBAHKAN API BARU INI ▼▼▼
+
     path('api/save_choice', views.api_save_choice, name='api_save_choice'), 
-    # ▲▲▲ AKHIR TAMBAHAN ▼▼▼
+
     
     path('api/history', views.api_history, name='api_history'), 
     path('api/clear_history', views.api_clear_history, name='api_clear_history'),
     path('api/upload_csv', views.api_upload_csv, name='api_upload_csv'),
     path('api/save_new_matches', views.api_save_new_matches, name='api_save_new_matches'),
+
+    path('articles/', views.article_list_page, name='article_list'),
+    path('article/<slug:slug>/', views.article_detail_page, name='article_detail'),
 ]

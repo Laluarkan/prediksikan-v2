@@ -4,6 +4,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.text import slugify
+from django.urls import reverse
 
 # ==========================================================
 # --- MANAGER KUSTOM UNTUK CUSTOM USER (Tidak Berubah) ---
@@ -69,3 +71,41 @@ class PredictionHistory(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
+
+class Article(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+    )
+    
+    title = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='blog_posts')
+    
+    # Konten
+    content = models.TextField() # Ini akan menjadi editor teks biasa
+    excerpt = models.CharField(max_length=255, help_text="Ringkasan singkat (untuk SEO dan pratinjau).")
+    
+    # SEO Meta
+    meta_description = models.CharField(max_length=160, blank=True, null=True, help_text="Deskripsi SEO (maks 160 karakter).")
+    
+    # Status & Waktu
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_on']
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        # Otomatis buat slug dari judul jika slug kosong
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        # Ini adalah URL kanonis untuk setiap artikel (penting untuk SEO)
+        return reverse('article_detail', kwargs={'slug': self.slug})
