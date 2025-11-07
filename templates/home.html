@@ -24,6 +24,29 @@
     </div>
   </header>
 
+  {% if latest_articles %}
+  <section class="articles-section">
+      <h2>Artikel & Wawasan Terbaru</h2>
+      <div class="article-grid">
+          {% for article in latest_articles %}
+          <a href="{{ article.get_absolute_url }}" class="article-card">
+              <div class="article-card-content">
+                  <h3>{{ article.title }}</h3>
+                  <p>{{ article.excerpt }}</p>
+                  <span class="article-card-footer">
+                      Oleh {{ article.author.first_name|default:article.author.email }} 
+                      - {{ article.created_on|date:"d M Y" }}
+                  </span>
+              </div>
+          </a>
+          {% endfor %}
+      </div>
+      <div class="article-actions">
+        <a href="{% url 'article_list' %}" class="btn small">Lihat Semua Artikel</a>
+      </div>
+  </section>
+  {% endif %}
+
   {% if user.is_authenticated and win_rate_stats %}
     <section class="win-rate-card">
         <h2>📊 Win Rate Pilihan Anda</h2>
@@ -66,29 +89,6 @@
       <a href="{% url 'history_list' %}" class="btn small view-all-history">Lihat Semua Riwayat</a> 
       <button id="clear-history" class="btn small">Bersihkan Riwayat</button>
     </div>
-  </section>
-  {% endif %}
-
-  {% if latest_articles %}
-  <section class="articles-section">
-      <h2>Artikel & Wawasan Terbaru</h2>
-      <div class="article-grid">
-          {% for article in latest_articles %}
-          <a href="{{ article.get_absolute_url }}" class="article-card">
-              <div class="article-card-content">
-                  <h3>{{ article.title }}</h3>
-                  <p>{{ article.excerpt }}</p>
-                  <span class="article-card-footer">
-                      Oleh {{ article.author.first_name|default:article.author.email }} 
-                      - {{ article.created_on|date:"d M Y" }}
-                  </span>
-              </div>
-          </a>
-          {% endfor %}
-      </div>
-      <div class="article-actions">
-        <a href="{% url 'article_list' %}" class="btn small">Lihat Semua Artikel</a>
-      </div>
   </section>
   {% endif %}
 
