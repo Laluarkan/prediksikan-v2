@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load markdown_extras %}
 
 {% block title %}{{ article.title }} - Prediksi-Kan{% endblock %}
 {% block meta_description %}{{ article.meta_description|default:article.excerpt }}{% endblock %}
@@ -18,7 +19,7 @@
         </p>
 
         <div class="article-body">
-            {{ article.content|linebreaks }}
+            {{ article.content|render_markdown|safe }}
         </div>
     </article>
 </div>
