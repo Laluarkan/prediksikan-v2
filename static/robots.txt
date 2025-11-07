@@ -9,4 +9,4 @@ Disallow: /accounts/
 
 # Tunjukkan Google di mana sitemap kita berada
 # Ganti dengan domain lengkap Anda saat deploy
-Sitemap: https://prediksi-kan-1.onrender.com/sitemap.xml
+Sitemap: https://prediksi-kan-1-8axc.onrender.com/sitemap.xml
