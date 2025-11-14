@@ -1,17 +1,13 @@
 /* static/css/add_data.css */
-
-/* ==============================
-    HALAMAN TAMBAH DATA (Mode Gelap Default)
-   ============================== */
 .container {
     max-width: 1100px;
     margin: 40px auto;
-    background: rgba(17, 24, 39, 0.95); /* Semi-transparan gelap */
+    background: rgba(17, 24, 39, 0.95); 
     border-radius: 16px;
     padding: 28px 30px;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(6px);
-    color: #e2e8f0; /* Teks terang default */
+    color: #e2e8f0;
 }
 
 h1 {
@@ -19,20 +15,20 @@ h1 {
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 25px;
-    color: #06b6d4; /* Warna aksen */
+    color: #06b6d4; 
 }
 
-.container p { /* Teks paragraf */
-    color: #cbd5e1; /* Warna teks sedikit redup */
+.container p { 
+    color: #cbd5e1;
     text-align: center;
     margin-bottom: 20px;
 }
 
-.actions { /* Kontainer tombol */
+.actions { 
     display: flex;
-    justify-content: center; /* Tombol di tengah */
-    gap: 15px; /* Jarak antar tombol */
-    margin-top: 20px; /* Jarak dari form */
+    justify-content: center; 
+    gap: 15px; 
+    margin-top: 20px; 
     margin-bottom: 30px;
 }
 
@@ -44,30 +40,30 @@ label {
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
-    color: #9fc5e8; /* Biru muda untuk label */
+    color: #9fc5e8; 
 }
 
 input[type="file"],
 select {
     width: 100%;
-    padding: 10px 12px; /* Padding konsisten */
+    padding: 10px 12px; 
     border-radius: 8px;
-    border: 1px solid #475569; /* Border abu-abu gelap */
-    background-color: #0f172a; /* Latar input sangat gelap */
-    color: #e2e8f0; /* Teks terang */
-    font-size: 1rem; /* Ukuran font standar */
-    transition: border-color 0.3s, box-shadow 0.3s; /* Transisi */
-    box-sizing: border-box; /* Agar padding tidak menambah lebar */
+    border: 1px solid #475569; 
+    background-color: #0f172a;
+    color: #e2e8f0; 
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s; 
+    box-sizing: border-box; 
 }
 
 input[type="file"] {
-    padding: 8px 12px; /* Padding sedikit berbeda untuk file input */
+    padding: 8px 12px; 
 }
-/* Style khusus untuk tombol file input */
+
 input[type="file"]::file-selector-button {
     padding: 8px 12px;
     border-radius: 6px;
-    background-color: #334155; /* Warna tombol file */
+    background-color: #334155; 
     color: #e2e8f0;
     border: none;
     cursor: pointer;
@@ -78,27 +74,25 @@ input[type="file"]::file-selector-button:hover {
     background-color: #475569;
 }
 
-
 input[type="file"]:focus,
 select:focus {
     outline: none;
-    border-color: #06b6d4; /* Warna aksen saat fokus */
-    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.3); /* Efek glow */
+    border-color: #06b6d4; 
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.3);
 }
 
-/* Tombol (gunakan style .btn dari universal, lalu override jika perlu) */
-.actions .btn { /* Target tombol di dalam .actions */
+.actions .btn {
     padding: 10px 24px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1rem; /* Ukuran font konsisten */
+    font-size: 1rem;
     font-weight: 600;
     transition: all 0.3s ease;
 }
 
 #saveBtn {
-    background-color: #22c55e; /* Hijau */
+    background-color: #22c55e;
     color: #fff;
     box-shadow: 0 3px 8px rgba(34, 197, 94, 0.3);
 }
@@ -108,7 +102,7 @@ select:focus {
     transform: translateY(-2px);
     box-shadow: 0 5px 12px rgba(34, 197, 94, 0.4);
 }
-#saveBtn:disabled { /* Style saat loading */
+#saveBtn:disabled { 
     background-color: #475569;
     cursor: not-allowed;
     transform: none;
@@ -117,7 +111,7 @@ select:focus {
 
 
 #toggleThemeBtn {
-    background-color: #334155; /* Abu-abu */
+    background-color: #334155; 
     color: #fff;
 }
 
@@ -125,82 +119,76 @@ select:focus {
     background-color: #475569;
 }
 
-/* Tabel Data */
 .table-container {
     margin-top: 30px;
-    overflow-x: auto; /* Scroll horizontal jika perlu */
-    background: #1e293b; /* Latar belakang tabel sedikit lebih terang */
+    overflow-x: auto; 
+    background: #1e293b; 
     border-radius: 8px;
-    padding: 10px; /* Padding di sekitar tabel */
-    border: 1px solid #334155; /* Border container tabel */
+    padding: 10px;
+    border: 1px solid #334155; 
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.85rem; /* Ukuran font lebih kecil untuk tabel */
-    white-space: nowrap; /* Cegah teks wrap di sel */
+    font-size: 0.85rem; 
+    white-space: nowrap; 
 }
 
 th, td {
-    padding: 10px 12px; /* Padding sel */
-    border-bottom: 1px solid #334155; /* Garis antar baris */
-    text-align: left; /* Teks rata kiri */
+    padding: 10px 12px; 
+    border-bottom: 1px solid #334155; 
+    text-align: left; 
 }
 
-th { /* Header tabel */
-    background: #0f172a; /* Latar header sangat gelap */
-    color: #93c5fd; /* Teks header biru muda */
+th { 
+    background: #0f172a;
+    color: #93c5fd; 
     font-weight: 600;
-    position: sticky; /* Header tetap terlihat saat scroll vertikal (jika container dibatasi tingginya) */
+    position: sticky;
     top: 0;
 }
 
-tbody tr:nth-child(even) { /* Warna belang untuk baris */
-    background-color: rgba(15, 23, 42, 0.3); /* Sedikit beda warna */
+tbody tr:nth-child(even) {
+    background-color: rgba(15, 23, 42, 0.3);
 }
 
-tbody tr:hover { /* Warna baris saat hover */
-    background: #334155; /* Abu-abu lebih terang */
+tbody tr:hover {
+    background: #334155;
 }
 
-/* Placeholder saat loading/kosong */
 td.text-center {
     text-align: center;
     color: var(--muted);
     padding: 20px;
 }
 
-
-/* ==============================
-    MODE TERANG (jika .dark-mode dihapus dari body)
-   ============================== */
 body:not(.dark-mode) .container {
-    background: #f8fafc; /* Latar terang */
-    color: #1e293b; /* Teks gelap */
+    background: #f8fafc;
+    color: #1e293b; 
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 body:not(.dark-mode) h1 {
-    color: #0ea5e9; /* Biru terang */
+    color: #0ea5e9; 
 }
 
 body:not(.dark-mode) .container p {
-    color: #475569; /* Abu-abu gelap */
+    color: #475569;
 }
 
 body:not(.dark-mode) label {
-    color: #334155; /* Label gelap */
+    color: #334155; 
 }
 
 body:not(.dark-mode) input[type="file"],
 body:not(.dark-mode) select {
-    border-color: #cbd5e1; /* Border terang */
-    background-color: #fff; /* Latar putih */
-    color: #1e293b; /* Teks gelap */
+    border-color: #cbd5e1; 
+    background-color: #fff; 
+    color: #1e293b; 
 }
 body:not(.dark-mode) input[type="file"]::file-selector-button {
-    background-color: #e2e8f0; /* Tombol file terang */
+    background-color: #e2e8f0; 
     color: #334155;
 }
 body:not(.dark-mode) input[type="file"]::file-selector-button:hover {
@@ -209,12 +197,12 @@ body:not(.dark-mode) input[type="file"]::file-selector-button:hover {
 
 body:not(.dark-mode) input[type="file"]:focus,
 body:not(.dark-mode) select:focus {
-    border-color: #0ea5e9; /* Aksen biru terang */
+    border-color: #0ea5e9; 
     box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
 }
 
 body:not(.dark-mode) #toggleThemeBtn {
-    background-color: #e2e8f0; /* Tombol toggle terang */
+    background-color: #e2e8f0;
     color: #334155;
 }
 body:not(.dark-mode) #toggleThemeBtn:hover {
@@ -222,41 +210,41 @@ body:not(.dark-mode) #toggleThemeBtn:hover {
 }
 
 body:not(.dark-mode) .table-container {
-    background: #fff; /* Latar tabel putih */
+    background: #fff; 
     border-color: #e2e8f0;
 }
 
 body:not(.dark-mode) th,
 body:not(.dark-mode) td {
-    border-color: #e2e8f0; /* Garis terang */
+    border-color: #e2e8f0; 
 }
 
 body:not(.dark-mode) th {
-    background: #f1f5f9; /* Latar header terang */
-    color: #0ea5e9; /* Teks header biru */
+    background: #f1f5f9;
+    color: #0ea5e9;
 }
 body:not(.dark-mode) tbody tr:nth-child(even) {
-     background-color: #f8fafc; /* Belang terang */
+     background-color: #f8fafc;
 }
 body:not(.dark-mode) tbody tr:hover {
-    background: #e2e8f0; /* Hover terang */
+    background: #e2e8f0;
 }
 body:not(.dark-mode) td.text-center {
-    color: #64748b; /* Placeholder terang */
+    color: #64748b;
 }
 
 /* Responsif */
 @media (max-width: 700px) {
   .container {
-    margin: 20px 10px; /* Kurangi margin di layar kecil */
+    margin: 20px 10px;
     padding: 20px;
   }
   .actions {
-      flex-direction: column; /* Tumpuk tombol di layar kecil */
+      flex-direction: column; 
   }
   .actions .btn {
-      width: 100%; /* Lebar penuh */
-      margin: 5px 0; /* Jarak vertikal */
+      width: 100%;
+      margin: 5px 0;
       box-sizing: border-box;
   }
 }

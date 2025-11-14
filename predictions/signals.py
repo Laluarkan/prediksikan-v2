@@ -12,6 +12,6 @@ def set_admin_role(sender, request, user, **kwargs):
     """
     if user.email == settings.ADMIN_EMAIL:
         user.role = 'admin'
-        user.is_staff = True  # Izinkan login ke /admin
-        user.is_superuser = True # Izinkan akses penuh ke /admin
+        user.is_staff = True  
+        user.is_superuser = True 
         user.save()

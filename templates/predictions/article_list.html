@@ -5,25 +5,27 @@
 {% block meta_description %}Kumpulan artikel, wawasan, dan analisis mendalam seputar prediksi sepak bola, statistik, dan strategi model dari Prediksi-Kan.{% endblock %}
 
 {% block page_styles %}
-    <link rel="stylesheet" href="{% static 'css/home.css' %}"> {% endblock %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/article.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="home-container">
     <section class="articles-section" style="max-width: 900px; margin-top: 40px;">
         <h1 style="text-align: center; color: var(--accent); margin-bottom: 30px;">Semua Artikel</h1>
         
-        <div class="article-grid">
+        <div class="article-list">
             {% for article in articles %}
-            <a href="{{ article.get_absolute_url }}" class="article-card">
-                <div class="article-card-content">
+            <div class="article-row">
+                <a href="{{ article.get_absolute_url }}" class="article-link">
                     <h3>{{ article.title }}</h3>
                     <p>{{ article.excerpt }}</p>
-                    <span class="article-card-footer">
+                    <span class="article-meta">
                         Oleh {{ article.author.first_name|default:article.author.email }} 
                         - {{ article.created_on|date:"d M Y" }}
                     </span>
-                </div>
-            </a>
+                </a>
+            </div>
             {% empty %}
             <p style="color: var(--muted); text-align: center;">Belum ada artikel yang dipublikasikan.</p>
             {% endfor %}

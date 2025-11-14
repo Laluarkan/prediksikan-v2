@@ -3,28 +3,27 @@
     max-width: 1100px;
     margin: 30px auto;
     padding: 20px;
-    color: #e2e8f0; /* Teks terang default */
+    color: #e2e8f0; 
 }
 
 .history-container h1 {
     text-align: center;
-    color: var(--accent); /* Warna aksen */
+    color: var(--accent);
     margin-bottom: 30px;
 }
 
 .history-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 kolom */
-    gap: 15px;
-    margin-bottom: 40px; /* Jarak ke garis pemisah */
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 15px; /* Jarak ke garis pemisah */
 }
 
 /* Style item di grid (ambil dari home.css, tapi pastikan background/border ada) */
 .hist-item-link { 
     display: block; 
     text-decoration: none; 
-    background: rgba(17, 24, 39, 0.7); /* Latar belakang item */
-    border: 1px solid #334155; /* Border abu-abu */
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid #334155; 
     border-radius: 8px;
     padding: 12px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -34,17 +33,17 @@
 }
 
 .hist-item-link:hover {
-    background: rgba(30, 41, 59, 0.9); /* Sedikit lebih terang saat hover */
+    background: rgba(30, 41, 59, 0.9); 
     transform: translateY(-3px);
     border-color: #475569;
 }
-.hist-item-link.selected { /* Style untuk item yang sedang dipilih */
+.hist-item-link.selected { 
      border-color: var(--accent);
      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
-     background: rgba(6, 182, 212, 0.1); /* Latar aksen transparan */
+     background: rgba(6, 182, 212, 0.1);
 }
 
-.hist-item-link strong { /* Liga */
+.hist-item-link strong {
     display: block;
     color: var(--accent);
     font-size: 0.95rem;
@@ -53,11 +52,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.hist-item-link small { /* Waktu */
+.hist-item-link small { 
     color: var(--muted);
     font-size: 0.8rem;
 }
-.hist-item-link span { /* Nama tim & hasil */
+.hist-item-link span { 
     display: block;
     margin-top: 4px;
     font-size: 0.85rem;
@@ -75,11 +74,11 @@
 
 /* Bagian Detail Prediksi */
 .prediction-details {
-    background: var(--card); /* Gunakan var(--card) */
+    background: var(--card);
     border-radius: 12px;
-    padding: 25px 30px; /* Padding lebih besar */
+    padding: 25px 30px; 
     margin-top: 20px;
-    border: 1px solid #334155; /* Border */
+    border: 1px solid #334155; 
 }
 
 .prediction-details h2 {
@@ -136,9 +135,6 @@
     font-size: 1.2rem; /* Sedikit lebih besar */
 }
 
-
-/* Gunakan style fitur dari index.css tapi buat read-only */
-/* (Copy paste bagian .elo-section, .stats-section, dll. dari index.css) */
 .elo-section, .stats-section, .hth-section, .odds-group {
     margin-bottom: 25px;
     padding: 0; /* Hapus padding default */
@@ -277,3 +273,14 @@
          font-size: 0.9rem;
     }
 }
+
+       #result-details { margin-top: 30px; padding: 20px; background-color: #0f172a; border: 1px solid var(--accent); border-radius: 8px; }
+       #result-details .result-title { text-align: center; font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-bottom: 15px; }
+       #result-details #main-result { text-align: center; font-size: 1.1rem; line-height: 1.7; margin-bottom: 25px; color: #e2e8f0; }
+       #result-details .prob-group { margin-bottom: 15px; }
+       #result-details .prob-group h4 { margin: 0 0 10px 0; color: #cbd5e1; font-weight: 600; font-size: 1rem; }
+       #result-details .prob-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; }
+       #result-details .prob-item span:first-child { width: 110px; color: var(--muted); flex-shrink: 0; }
+       #result-details .prob-item span:last-child { width: 50px; font-weight: 600; flex-shrink: 0; color: #e2e8f0; }
+       #result-details .prob-bar { flex-grow: 1; height: 16px; background-color: #1e293b; border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
+       #result-details .bar { height: 100%; width: 0%; border-radius: 8px; }

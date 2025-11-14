@@ -23,6 +23,63 @@
       <a class="btn sawer" href="https://saweria.co/prediksikan" target="_blank">Dukung Kami</a>
     </div>
   </header>
+  
+  <section class="suggestion-link">
+      <p>Punya ide fitur atau menemukan *bug*? Bantu kami jadi lebih baik!</p>
+      <a href="https://saweria.co/prediksikan" target="_blank" class="btn small suggestion-btn">Kirim Saran Pengembangan</a>
+  </section>
+
+  {% if user.is_authenticated %}
+  <section class="history">
+    <h2>Riwayat Prediksi Terbaru</h2> 
+    <div id="history-list">(Memuat riwayat...)</div>
+    <div class="history-actions">
+      <a href="{% url 'history_list' %}" class="btn small view-all-history">Lihat Semua Riwayat</a> 
+      <button id="clear-history" class="btn small">Bersihkan Riwayat</button>
+    </div>
+  </section>
+  {% endif %}
+  
+  {% if not user.is_authenticated %}
+  <section class="login-prompt">
+      <h2>Simpan Riwayat Prediksi Anda! 📝</h2>
+      <p>Ingin melihat kembali prediksi yang pernah Anda buat? Login dengan akun Google Anda untuk menyimpan riwayat secara otomatis.</p>
+      <a href="{% url 'account_login' %}" class="btn">Login dengan Google</a>
+  </section>
+  {% endif %}
+
+  {% if system_stats %}
+  <section class="model-win-rate-card">
+  <h2>Riwayat Performa Model</h2>
+  <p>Ini adalah arsip lengkap dari akurasi model kami setiap kali data pertandingan baru diunggah.</p>
+  <div class="model-stats-scroller">
+    <div class="model-stats-track">
+      {% for stat in system_stats %}
+        <div class="model-stat-capsule">
+          <span class="stat-league">{{ stat.league_name }}</span>
+          <div class="stat-data">
+            <span class="stat-value">{{ stat.best_bet_win_rate|floatformat:1 }}%</span>
+            <span class="stat-detail">{{ stat.best_bet_correct }}/{{ stat.best_bet_total }} Tebakan</span>
+          </div>
+        </div>
+      {% endfor %}
+      {% for stat in system_stats %}
+        <div class="model-stat-capsule" aria-hidden="true">
+          <span class="stat-league">{{ stat.league_name }}</span>
+          <div class="stat-data">
+            <span class="stat-value">{{ stat.best_bet_win_rate|floatformat:1 }}%</span>
+            <span class="stat-detail">{{ stat.best_bet_correct }}/{{ stat.best_bet_total }} Tebakan</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <p class="stat-footer">Dihitung pada: {{ system_stats.0.timestamp|date:"d M Y" }}</p>
+  <div class="article-actions" style="margin-top: 20px; margin-bottom: 0;">
+    <a href="{% url 'model_performance_page' %}" class="btn small">Lihat Semua Performa</a>
+  </div>
+</section>
+  {% endif %}
 
   {% if latest_articles %}
   <section class="articles-section">
@@ -68,79 +125,62 @@
     </section>
   {% endif %}
 
-  <section class="suggestion-link">
-      <p>Punya ide fitur atau menemukan *bug*? Bantu kami jadi lebih baik!</p>
-      <a href="https://saweria.co/prediksikan" target="_blank" class="btn small suggestion-btn">Kirim Saran Pengembangan</a>
-  </section>
-  
-  {% if not user.is_authenticated %}
-  <section class="login-prompt">
-      <h2>Simpan Riwayat Prediksi Anda! 📝</h2>
-      <p>Ingin melihat kembali prediksi yang pernah Anda buat? Login dengan akun Google Anda untuk menyimpan riwayat secara otomatis.</p>
-      <a href="{% url 'account_login' %}" class="btn">Login dengan Google</a>
-  </section>
-  {% endif %}
-  
-  {% if user.is_authenticated %}
-  <section class="history">
-    <h2>Riwayat Prediksi Terbaru (5)</h2> 
-    <div id="history-list">(Memuat riwayat...)</div>
-    <div class="history-actions">
-      <a href="{% url 'history_list' %}" class="btn small view-all-history">Lihat Semua Riwayat</a> 
-      <button id="clear-history" class="btn small">Bersihkan Riwayat</button>
-    </div>
-  </section>
-  {% endif %}
+  <div class="info-accordion">
+    <details class="info-dropdown">
+        <summary>Batasan Model (Disclaimer)</summary>
+        <div class="info-content">
+            <p>
+                Sebuah model tidak akan pernah bisa memprediksi bola yang membentur tiang, keputusan VAR yang kontroversial, atau pemain kunci yang tiba-tiba cedera. 
+                Sepak bola penuh dengan keacakan. Tembakan yang terdefleksi, kiper yang melakukan penyelamatan mustahil, atau penalti yang gagal. Ini tidak bisa diprediksi.
+            </p>
+            <p>
+                Gunakan prediksi kami sebagai wawasan berbasis data, bukan jaminan hasil akhir.
+            </p>
+        </div>
+    </details>
 
-  <section class="disclaimer">
-      <h2>Batasan Model (Disclaimer)</h2>
-      <p>
-          Sebuah model tidak akan pernah bisa memprediksi bola yang membentur tiang, keputusan VAR yang kontroversial, atau pemain kunci yang tiba-tiba cedera. 
-          Sepak bola penuh dengan keacakan. Tembakan yang terdefleksi, kiper yang melakukan penyelamatan mustahil, atau penalti yang gagal. Ini tidak bisa diprediksi.
-      </p>
-      <p>
-          Gunakan prediksi kami sebagai wawasan berbasis data, bukan jaminan hasil akhir.
-      </p>
-  </section>
+    <details class="info-dropdown">
+        <summary>Tentang Aplikasi Prediksi-Kan</summary>
+        <div class="info-content">
+            <p>
+                <strong>Prediksi-Kan</strong> adalah aplikasi web cerdas yang dirancang untuk memprediksi hasil pertandingan sepak bola secara akurat menggunakan teknologi <strong>Machine Learning</strong> dan <strong>Google Gemini AI</strong>.  
+                Aplikasi ini memanfaatkan data historis dan analisis statistik mendalam untuk memberikan prediksi yang lebih realistis dan informatif kepada pengguna.  
+            </p>
+            <p>
+                Dengan antarmuka yang bersih, interaktif, dan responsif, <strong>Prediksi-Kan</strong> cocok digunakan oleh penggemar sepak bola, analis, hingga pengembang yang tertarik pada penerapan <em>Artificial Intelligence</em> dalam dunia olahraga.  
+                Kami berkomitmen menghadirkan pengalaman analisis modern yang tidak hanya cepat, tetapi juga intuitif dan dapat diandalkan.
+            </p>
+        </div>
+    </details>
 
-  <section class="about">
-  <h2>Tentang Aplikasi <strong>Prediksi-Kan</strong></h2>
-  <p>
-    <strong>Prediksi-Kan</strong> adalah aplikasi web cerdas yang dirancang untuk memprediksi hasil pertandingan sepak bola secara akurat menggunakan teknologi <strong>Machine Learning</strong> dan <strong>Google Gemini AI</strong>.  
-    Aplikasi ini memanfaatkan data historis dan analisis statistik mendalam untuk memberikan prediksi yang lebih realistis dan informatif kepada pengguna.  
-  </p>
-  <p>
-    Dengan antarmuka yang bersih, interaktif, dan responsif, <strong>Prediksi-Kan</strong> cocok digunakan oleh penggemar sepak bola, analis, hingga pengembang yang tertarik pada penerapan <em>Artificial Intelligence</em> dalam dunia olahraga.  
-    Kami berkomitmen menghadirkan pengalaman analisis modern yang tidak hanya cepat, tetapi juga intuitif dan dapat diandalkan.
-  </p>
-</section>
+    <details class="info-dropdown">
+        <summary>Daftar Liga & Cara Kerja</summary>
+        <div class="info-content">
+            <h3 class="info-subheading">Daftar Liga</h3>
+            <ol>
+                <li>Liga Belanda</li>
+                <li>Liga Belgia</li>
+                <li>Liga Inggris.</li>
+                <li>Liga Itali</li>
+                <li>Liga Jerman</li>
+                <li>Liga Perancis</li>
+                <li>Liga Portugal</li>
+                <li>Liga Skotlandia</li>
+                <li>Liga Spanyol</li>
+                <li>Liga Turki</li>
+            </ol>
+            <p>Kamu juga bisa memilih <strong>All League</strong> sebagai alat untuk prediksi <strong>UCL</strong></p>
 
-<section class="how-it-works">
-    <h2>Daftar Liga</h2>
-    <ol>
-      <li>Liga Belanda</li>
-      <li>Liga Belgia</li>
-      <li>Liga Inggris.</li>
-      <li>Liga Itali</li>
-      <li>Liga Jerman</li>
-      <li>Liga Perancis</li>
-      <li>Liga Portugal</li>
-      <li>Liga Skotlandia</li>
-      <li>Liga Spanyol</li>
-      <li>Liga Turki</li>
-    </ol>
-    <p>Kamu juga bisa memilih <strong>All League</strong> sebagai alat untuk prediksi <strong>UCL</strong></p>
-  </section>
-
-  <section class="how-it-works">
-    <h2>Cara Kerja Prediksi</h2>
-    <ol>
-      <li>Pilih liga dan tim yang ingin kamu analisis di halaman <strong>Prediksi</strong>.</li>
-      <li>Data dimasukkan ke dalam model pembelajaran mesin yang telah dilatih.</li>
-      <li>Hasil prediksi ditampilkan langsung dan disimpan ke dalam riwayat (jika Anda login).</li>
-    </ol>
-    <p>Kamu juga bisa memantau performa prediksi di halaman <strong>Statistik</strong>.</p>
-  </section>
+            <h3 class="info-subheading">Cara Kerja Prediksi</h3>
+            <ol>
+                <li>Pilih liga dan tim yang ingin kamu analisis di halaman <strong>Prediksi</strong>.</li>
+                <li>Data dimasukkan ke dalam model pembelajaran mesin yang telah dilatih.</li>
+                <li>Hasil prediksi ditampilkan langsung dan disimpan ke dalam riwayat (jika Anda login).</li>
+            </ol>
+            <p>Kamu juga bisa memantau performa prediksi di halaman <strong>Statistik</strong>.</p>
+        </div>
+    </details>
+</div>
 </div>
 
 <footer class="main-footer">
@@ -148,93 +188,5 @@
     <div class="footer-data-source">Data sourced from <a href="https://www.football-data.co.uk/" target="_blank" rel="noopener noreferrer">football-data.co.uk</a></div>
 </footer>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    
-    const csrfTokenEl = document.querySelector('input[name="csrfmiddlewaretoken"]');
-    const csrfToken = csrfTokenEl ? csrfTokenEl.value : null;
-
-    const historyList = document.getElementById('history-list');
-    const clearBtn = document.getElementById('clear-history');
-    
-
-    async function renderHistory() {
-        if (!historyList) return;
-        
-        historyList.innerHTML = '<p>(Memuat riwayat...)</p>'; // Loading
-        try { 
-            const res = await fetch('/api/history'); 
-            const data = await res.json();
-            
-            if (!res.ok || data.status !== 'ok') { 
-                historyList.innerHTML = '<p style="color:red;">Gagal memuat riwayat.</p>';
-                return;
-            }
-            
-            // Ambil maksimal 5 item pertama dari data API
-            const h = data.history.slice(0, 5); // <<--- BATASI 5 ITEM
-            
-            if (!h.length) {
-                historyList.textContent = '(Belum ada riwayat)';
-                return;
-            }
-            historyList.innerHTML = ''; 
-            
-            h.forEach(item => { 
-                const el = document.createElement('a'); // <<--- UBAH JADI LINK (<a>)
-                el.className = 'hist-item'; 
-                el.href = `/history/${item.id}/`; // <<--- LINK KE DETAIL
-                
-                // Format Waktu ke Bahasa Indonesia
-                const timestamp = item.timestamp 
-                    ? new Date(item.timestamp).toLocaleString('id-ID', { 
-                        day: '2-digit', month: '2-digit', year:'numeric', 
-                        hour: '2-digit', minute: '2-digit' 
-                      }) 
-                    : '(Waktu tidak tersimpan)';
-
-                el.innerHTML = `
-                    <strong>${item.league}</strong>
-                    <span class="hist-match">${item.home_team || 'Tim Home'} vs ${item.away_team || 'Tim Away'}</span>
-                    <small>${timestamp}</small>
-                    <span class="hist-preds">
-                        HDA: ${item.prediction.HDA?.label || '-'} | 
-                        OU: ${item.prediction.OU25?.label || '-'} | 
-                        BTTS: ${item.prediction.BTTS?.label || '-'}
-                    </span>
-                `;
-                historyList.appendChild(el);
-            });
-        } catch (error) {
-             console.error("Fetch history error:", error);
-             historyList.innerHTML = '<p style="color:red;">Error koneksi saat memuat riwayat.</p>';
-        }
-    }
-
-    // Event listener clearBtn tidak berubah
-    if (clearBtn) {
-        clearBtn.addEventListener('click', async () => {
-            if (!csrfToken) {
-              alert('Gagal menghapus riwayat: Token keamanan tidak ditemukan.');
-              return;
-            }
-            if (confirm("Anda yakin ingin menghapus semua riwayat prediksi?")) { // Tambah konfirmasi
-                try {
-                     await fetch('/api/clear_history', { 
-                       method: 'POST',
-                       headers: { 'X-CSRFToken': csrfToken }
-                     });
-                     renderHistory(); // Muat ulang riwayat (akan kosong)
-                 } catch (error) {
-                      alert('Gagal menghapus riwayat karena error koneksi.');
-                 }
-            }
-        });
-    }
-
-    if (historyList) {
-        renderHistory();
-    }
-});
-</script>
+<script src="{% static 'js/home.js' %}"></script>
 {% endblock %}

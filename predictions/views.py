@@ -5,22 +5,22 @@ import pandas as pd
 import numpy as np
 import os
 import joblib
-from django.shortcuts import render, redirect, get_object_or_404 # Tambah get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404 
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
 import google.generativeai as genai
-import traceback # <<< TAMBAHKAN IMPORT INI
-import math # <<< TAMBAHKAN IMPORT INI
+import traceback
+import math
 from django.db.models import Q
-from .models import PredictionHistory
 from .decorators import admin_required
 from .logic import * 
-from .models import PredictionHistory, CustomUser, Article
+from .models import PredictionHistory, CustomUser, Article, SystemPerformanceStats
+from datetime import datetime, timedelta
+from itertools import groupby
 
-# ▼▼▼ Konfigurasi Google AI ▼▼▼
 try:
     GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
     if not GOOGLE_API_KEY:
@@ -28,26 +28,33 @@ try:
         gemini_model = None
     else:
         genai.configure(api_key=GOOGLE_API_KEY)
-        # Ganti 'gemini-pro' jika Anda menggunakan model lain
         gemini_model = genai.GenerativeModel('gemini-2.5-flash-lite')
         print("\033[92mGoogle AI (Gemini) berhasil dikonfigurasi.\033[0m")
 except Exception as e:
     print(f"\033[91mERROR: Gagal mengkonfigurasi Google AI: {e}\033[0m")
     gemini_model = None
-# ▲▲▲ ----------------------- ▲▲▲
-
-# ==========================================================
-# ROUTES HALAMAN (YANG MERENDER HTML)
-# ==========================================================
 
 def home_page(request):
     context = {}
-    
-    # Ambil 3 artikel terbaru yang sudah 'published'
     latest_articles = Article.objects.filter(status='published').order_by('-created_on')[:3]
     context['latest_articles'] = latest_articles
-    
-    # Jika user login, hitung win rate mereka
+
+    league_names = SystemPerformanceStats.objects.order_by(
+        '-timestamp'
+    ).values_list('league_name', flat=True).distinct()[:10]
+
+    latest_stats = []
+    for league in league_names:
+        # Untuk setiap liga, ambil data TERBARU (first())
+        latest_stat_for_league = SystemPerformanceStats.objects.filter(
+            league_name=league
+        ).order_by('-timestamp').first()
+        
+        if latest_stat_for_league:
+            latest_stats.append(latest_stat_for_league)
+
+    context['system_stats'] = latest_stats
+
     if request.user.is_authenticated:
         user_preds = PredictionHistory.objects.filter(
             user=request.user, 
@@ -111,21 +118,16 @@ def add_data_page(request):
     context = {'leagues': leagues}
     return render(request, 'predictions/add_data.html', context)
 
-# ▼▼▼ TAMBAHKAN VIEW BARU INI ▼▼▼
 @login_required
 def history_page(request, history_id=None):
-    # Ambil 10 riwayat terbaru untuk grid atas
-    latest_histories = PredictionHistory.objects.filter(user=request.user).order_by('-timestamp')[:20]
-    
+    latest_histories = PredictionHistory.objects.filter(user=request.user).order_by('-timestamp')[:20] 
     selected_history = None
     if history_id:
-        # Ambil detail riwayat spesifik jika ID diberikan (pastikan hanya milik user)
         selected_history = get_object_or_404(PredictionHistory, id=history_id, user=request.user)
         
     context = {
         'latest_histories': latest_histories,
         'selected_history': selected_history,
-        # Definisikan kolom fitur agar mudah diloop di template
         'feature_columns_meta': {
             'elo': ['HomeTeamElo', 'AwayTeamElo', 'EloDifference'],
             'home_stats': ['Home_AvgGoalsScored', 'Home_AvgGoalsConceded', 'Home_Wins', 'Home_Draws', 'Home_Losses'],
@@ -133,7 +135,7 @@ def history_page(request, history_id=None):
             'hth': ['HTH_HomeWins', 'HTH_AwayWins', 'HTH_Draws', 'HTH_AvgHomeGoals', 'HTH_AvgAwayGoals'],
             'odds': ['AvgH', 'AvgD', 'AvgA', 'Avg>2.5', 'Avg<2.5']
         },
-         'feature_labels': { # Label yang lebih ramah (sesuaikan jika perlu)
+         'feature_labels': { 
             'HomeTeamElo': 'Elo Home', 'AwayTeamElo': 'Elo Away', 'EloDifference': 'Selisih Elo',
             'Home_AvgGoalsScored': 'Gol Dicetak (Home)', 'Home_AvgGoalsConceded': 'Gol Kebobolan (Home)', 'Home_Wins': 'Menang (Home)', 'Home_Draws': 'Seri (Home)', 'Home_Losses': 'Kalah (Home)',
             'Away_AvgGoalsScored': 'Gol Dicetak (Away)', 'Away_AvgGoalsConceded': 'Gol Kebobolan (Away)', 'Away_Wins': 'Menang (Away)', 'Away_Draws': 'Seri (Away)', 'Away_Losses': 'Kalah (Away)',
@@ -142,21 +144,13 @@ def history_page(request, history_id=None):
         }
     }
     return render(request, 'predictions/history.html', context)
-# ▲▲▲ AKHIR VIEW BARU ▲▲▲
-
-
-# ==========================================================
-# ROUTES API (YANG MENGEMBALIKAN JSON)
-# ==========================================================
 
 def api_leagues(request):
-    # ... (kode Anda tidak berubah) ...
     leagues = list_leagues()
     return JsonResponse({'status': 'ok', 'leagues': leagues})
 
 @require_POST
 def api_team_stats(request):
-    # ... (kode Anda tidak berubah) ...
     try:
         body = json.loads(request.body)
         league = body.get('league'); team = body.get('team')
@@ -179,7 +173,6 @@ def api_team_stats(request):
 
 
 def api_teams(request):
-    # ... (kode Anda tidak berubah) ...
     league = request.GET.get('league')
     if not league: return JsonResponse({'status': 'error', 'message': 'parameter league diperlukan'}, status=400)
     try:
@@ -201,7 +194,6 @@ def api_teams(request):
 
 @require_POST
 def api_features(request):
-    # ... (kode Anda tidak berubah) ...
     try:
         body = json.loads(request.body)
         league = body.get('league'); home = body.get('home'); away = body.get('away')
@@ -214,13 +206,12 @@ def api_features(request):
     except FileNotFoundError as e: return JsonResponse({'status': 'error', 'message': str(e)}, status=404)
     except Exception as e: return JsonResponse({'status': 'error', 'message': f"Gagal menghitung fitur: {e}"}, status=500)
 
-# ▼▼▼ PERBARUI VIEW INI ▼▼▼
 @require_POST
 def api_predict(request):
     try:
         body = json.loads(request.body)
         league = body.get('league')
-        features = body.get('features') # Fitur input
+        features = body.get('features')
         home_team = body.get('home_team')
         away_team = body.get('away_team')
     except json.JSONDecodeError:
@@ -229,7 +220,6 @@ def api_predict(request):
     if not all([league, features, home_team, away_team]):
         return JsonResponse({'status': 'error', 'message': 'Data liga, fitur, dan tim diperlukan'}, status=400)
 
-    # --- 1. Lakukan Prediksi Model ML ---
     try:
         league_to_use = league
         if league == ALL_LEAGUES:
@@ -239,8 +229,6 @@ def api_predict(request):
 
         league_dir = os.path.join(MODEL_DIR, league_to_use.lower().replace(' ', '_'))
         if not os.path.isdir(league_dir): return JsonResponse({'status':'error','message':f'Model {league_to_use} tidak ditemukan.'}, status=404)
-
-        # Load models, scaler, encoders
         model_hda=joblib.load(os.path.join(league_dir,'model_hda.pkl'))
         model_ou25=joblib.load(os.path.join(league_dir,'model_ou25.pkl'))
         model_btts=joblib.load(os.path.join(league_dir,'model_btts.pkl'))
@@ -251,11 +239,8 @@ def api_predict(request):
 
         if not isinstance(features, dict): return JsonResponse({'status': 'error', 'message': 'Format fitur tidak valid.'}, status=400)
         feature_values = {col: features.get(col) for col in FEATURE_COLUMNS}
-        df_features = pd.DataFrame([feature_values]).fillna(0) # Handle missing values
-
+        df_features = pd.DataFrame([feature_values]).fillna(0) 
         X_scaled = scaler.transform(df_features)
-
-        # Hitung probabilitas
         probs_hda = model_hda.predict_proba(X_scaled)[0]
         probs_ou = model_ou25.predict_proba(X_scaled)[0]
         probs_btts = model_btts.predict_proba(X_scaled)[0]
@@ -265,8 +250,6 @@ def api_predict(request):
         pred_hda = le_ftr.classes_[np.argmax(probs_hda)]
         pred_ou = le_ou.classes_[np.argmax(probs_ou)]
         pred_btts = le_btts.classes_[np.argmax(probs_btts)]
-
-        # Hasil prediksi ML
         ml_result = {
             'HDA': {'label': pred_hda, 'probs': probs_hda_dict},
             'OU25': {'label': pred_ou, 'probs': probs_ou_dict},
@@ -280,11 +263,9 @@ def api_predict(request):
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': f'Kesalahan internal saat prediksi ML: {e}'}, status=500)
 
-    # --- 2. Hasilkan Penjelasan AI (Gemini) ---
-    ai_explanation = "Penjelasan AI tidak tersedia." # Default
+    ai_explanation = "Penjelasan AI tidak tersedia." 
     if gemini_model:
         try:
-            # Hitung total gol untuk data kontekstual
             home_wins = features.get('Home_Wins', 0)
             home_draws = features.get('Home_Draws', 0)
             home_losses = features.get('Home_Losses', 0)
@@ -299,9 +280,6 @@ def api_predict(request):
             away_scored_total = math.ceil(features.get('Away_AvgGoalsScored', 0) * away_count)
             away_conceded_total = math.ceil(features.get('Away_AvgGoalsConceded', 0) * away_count)
 
-            # ------------------------------
-            # PROMPT BARU UNTUK GEMINI
-            # ------------------------------
             prompt = f"""
             Anda adalah analis sepak bola profesional. Berikan penjelasan singkat dan objektif (1–3 kalimat)
             tentang hasil prediksi pertandingan {home_team} vs {away_team} di {league}, 
@@ -333,7 +311,6 @@ def api_predict(request):
             print(prompt)
             print("---------------------------------------\n")
 
-            # Kirim ke Gemini
             response = gemini_model.generate_content(prompt)
             ai_explanation = response.text
 
@@ -343,8 +320,6 @@ def api_predict(request):
             print(f"\033[91mERROR: Gagal memanggil Google AI API: {gemini_error}\033[0m")
             traceback.print_exc()
             ai_explanation = "Tidak dapat memuat penjelasan AI saat ini."
-
-    # --- 3. Simpan Riwayat ---
 
     new_history_obj = add_prediction_to_history(
         user=request.user, 
@@ -357,51 +332,40 @@ def api_predict(request):
         input_features=features,
     )
     
-    # Ambil ID dari objek yang baru dibuat
     new_history_id = new_history_obj.id if new_history_obj else None
 
-    # --- 4. Kirim Respons ---
     return JsonResponse({
         'status': 'ok',
         'prediction': ml_result,
         'explanation': ai_explanation,
         'history_id': new_history_id
     })
-# ▲▲▲ AKHIR PERUBAHAN API PREDICT ▲▲▲
 
-# ▼▼▼ PERBARUI VIEW INI ▼▼▼
 @login_required
 def api_history(request):
-    # Ambil 10 riwayat terbaru untuk halaman riwayat
     histories_query = PredictionHistory.objects.filter(user=request.user).order_by('-timestamp')[:20] 
     
     history_list = []
     for item in histories_query:
         history_list.append({
-            'id': item.id, # <-- TAMBAHKAN ID
+            'id': item.id, 
             'league': item.league,
             'home_team': item.home_team,
             'away_team': item.away_team,
             'prediction': item.prediction_data,
             'timestamp': item.timestamp.isoformat()
         })
-    # Tidak perlu reverse(), order_by('-timestamp') sudah benar
     return JsonResponse({'status': 'ok', 'history': history_list})
-# ▲▲▲ AKHIR PERUBAHAN api_history ▲▲▲
 
 @login_required
 @require_POST
 def api_clear_history(request):
-    # ... (kode Anda tidak berubah) ...
     try:
         PredictionHistory.objects.filter(user=request.user).delete()
         return JsonResponse({'status': 'ok', 'message': 'Riwayat dibersihkan'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'Gagal membersihkan riwayat: {str(e)}'}, status=500)
 
-# ==========================================================
-# ROUTES ADMIN (ADD DATA) - Tidak Berubah
-# ==========================================================
 @login_required
 @admin_required
 @require_POST
@@ -417,72 +381,47 @@ def api_upload_csv(request):
     if not all([league, file]):
         return JsonResponse({'status': 'error', 'message': 'Liga dan file CSV diperlukan'}, status=400)
     
-    # Tentukan 11 kolom dasar yang kita ambil dari CSV
     INPUT_COLUMNS = [
         'Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR',
         'AvgH', 'AvgD', 'AvgA', 'Avg>2.5', 'Avg<2.5'
     ]
 
     try:
-        # 1. Baca CSV
         df_new_raw = pd.read_csv(file)
-        
-        # 2. Cek apakah kolom dasar ada
         if not all(col in df_new_raw.columns for col in INPUT_COLUMNS):
             missing_cols = [col for col in INPUT_COLUMNS if col not in df_new_raw.columns]
             return JsonResponse({'status': 'error', 'message': f'CSV Anda kekurangan kolom: {", ".join(missing_cols)}'}, status=400)
-
-        # 3. Filter HANYA 11 kolom input (memenuhi permintaan Anda)
         df_new = df_new_raw[INPUT_COLUMNS].copy()
-
-        # 4. Bersihkan tipe data (SANGAT PENTING)
-        
-        # ▼▼▼ PERBAIKAN FORMAT TANGGAL ▼▼▼
-        # Coba tebak format tanggal (misal DD/MM/YYYY atau YYYY-MM-DD)
-        # dayfirst=True membantu pandas memprioritaskan DD/MM/YYYY
         df_new['Date'] = pd.to_datetime(df_new['Date'], dayfirst=True, errors='coerce') 
-        
-        # Buang baris yang tanggalnya tidak valid (NaT)
         if df_new.empty:
              return JsonResponse({'status': 'error', 'message': 'Tidak ada baris dengan format tanggal yang valid di CSV.'}, status=400)
-        # ▲▲▲ AKHIR PERBAIKAN TANGGAL ▲▲▲
-
-        # Konversi Skor (sudah ada di kode Anda)
         score_cols = ['FTHG', 'FTAG']
         for col in score_cols:
             if col in df_new.columns:
                 df_new[col] = pd.to_numeric(df_new[col], errors='coerce')
                 df_new[col] = df_new[col].fillna(0).astype(int)
-
-        # 5. Muat data lama (sudah di-convert ke datetime oleh load_league_dataset_by_name)
         df_existing = load_league_dataset_by_name(league)
-        
-        # 6. Filter pertandingan baru (sekarang membandingkan datetime vs datetime)
-        # Buat 'match_id' unik untuk perbandingan
         df_existing['match_id_str'] = df_existing['Date'].dt.strftime('%Y-%m-%d') + df_existing['HomeTeam'] + df_existing['AwayTeam']
-        existing_matches_str = set(df_existing['match_id_str'])
-        
+        existing_matches_str = set(df_existing['match_id_str']) 
         df_new['match_id_str'] = df_new['Date'].dt.strftime('%Y-%m-%d') + df_new['HomeTeam'] + df_new['AwayTeam']
-
         mask_new = ~df_new['match_id_str'].isin(existing_matches_str)
-        
         df_new_only = df_new[mask_new].copy()
-        
-        # Hapus kolom helper
         df_new_only.drop(columns=['match_id_str'], inplace=True)
         if 'match_id_str' in df_existing.columns:
             df_existing.drop(columns=['match_id_str'], inplace=True)
-
-
         if df_new_only.empty:
             return JsonResponse({'status': 'ok', 'message': 'Tidak ada pertandingan baru yang ditemukan.'}, status=200)
-
-        # 7. Hitung fitur (Elo, Stats, H2H) menggunakan logic.py
         df_new_full = update_elo_and_features(df_existing, df_new_only)
-
         check_prediction_results(df_new_full)
-        
-        # 8. Format output untuk ditampilkan di tabel
+
+        try:
+            # Kita kirim nama liga (misal "Liga Belanda")
+            calculate_model_performance(df_new_full, league) 
+        except Exception as e:
+            # Jangan gagalkan seluruh proses jika ini error
+            print(f"⚠️  Peringatan: Gagal menghitung Win Rate Model. Error: {e}")
+            traceback.print_exc()
+
         df_output = df_new_full.copy()
         
         if 'Date' in df_output.columns:
@@ -500,14 +439,13 @@ def api_upload_csv(request):
     except FileNotFoundError as e:
          return JsonResponse({'status': 'error', 'message': f'Gagal memuat dataset liga: {e}'}, status=404)
     except Exception as e:
-        traceback.print_exc() # Cetak error lengkap di terminal Django
+        traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': f'Terjadi kesalahan internal: {e}'}, status=500)
 
 @login_required
 @admin_required
 @require_POST
 def api_save_new_matches(request):
-    # ... (kode Anda tidak berubah) ...
     try:
         body = json.loads(request.body)
         league = body.get('league'); matches = body.get('matches')
@@ -530,12 +468,11 @@ def api_save_choice(request):
     try:
         body = json.loads(request.body)
         history_id = body.get('id')
-        choice_type = body.get('type') # HDA, OU, atau BTTS
-        choice_value = body.get('value') # H, D, A, Over, Under, Yes, No
+        choice_type = body.get('type') 
+        choice_value = body.get('value') 
         
         history = PredictionHistory.objects.get(id=history_id, user=request.user)
-        
-        # Update kolom sesuai pilihan
+
         if choice_type == 'HDA':
             history.hda_chosen = choice_value
         elif choice_type == 'OU':
@@ -543,7 +480,7 @@ def api_save_choice(request):
         elif choice_type == 'BTTS':
             history.btts_chosen = choice_value
             
-        history.is_preferred_choice = True # Asumsikan pilihan ini yang terbaik
+        history.is_preferred_choice = True
         history.save()
         
         return JsonResponse({'status': 'ok', 'message': f'Pilihan {choice_type} ({choice_value}) berhasil disimpan sebagai pilihan terbaik.'})
@@ -552,3 +489,41 @@ def api_save_choice(request):
         return JsonResponse({'status': 'error', 'message': 'Riwayat tidak ditemukan atau bukan milik Anda.'}, status=404)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'Gagal menyimpan pilihan: {str(e)}'}, status=500)
+    
+def model_performance_page(request):
+    """
+    Menampilkan semua data performa model, dikelompokkan berdasarkan minggu.
+    """
+    # 1. Ambil semua data performa, diurutkan dari terbaru
+    all_stats = SystemPerformanceStats.objects.all().order_by('-timestamp')
+    
+    # 2. Tentukan minggu saat ini
+    today = datetime.now().date()
+    current_week_num = today.isocalendar()[1]
+    current_year = today.year
+    
+    # 3. Fungsi untuk memberi label minggu
+    def get_week_label(date_obj):
+        week_num = date_obj.isocalendar()[1]
+        year = date_obj.year
+        
+        if year == current_year:
+            if week_num == current_week_num:
+                return "Minggu Ini"
+            elif week_num == current_week_num - 1:
+                return "Minggu Lalu"
+        
+        # Label default untuk minggu-minggu yang lebih lama
+        # "Minggu ke-45, 2025"
+        return f"Minggu ke-{week_num}, {year}"
+
+    # 4. Kelompokkan data berdasarkan label minggu
+    grouped_stats = {}
+    # Buat key (label minggu) berdasarkan timestamp
+    for key, group in groupby(all_stats, key=lambda stat: get_week_label(stat.timestamp)):
+        grouped_stats[key] = list(group)
+
+    context = {
+        'grouped_stats': grouped_stats
+    }
+    return render(request, 'predictions/model_performance.html', context)

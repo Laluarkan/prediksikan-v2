@@ -10,21 +10,15 @@ from datetime import datetime, timezone
 from django.db.models import Q
 from django.conf import settings
 from .models import PredictionHistory 
+from .models import PredictionHistory, SystemPerformanceStats
 
-# ==========================================================
-# KONSTANTA 
-# ==========================================================
 DATASET_DIR = settings.DATASET_DIR
 MODEL_DIR = settings.MODEL_DIR
 FEATURE_COLUMNS = settings.FEATURE_COLUMNS
 ALL_LEAGUES = settings.ALL_LEAGUES
 INITIAL_ELO = settings.INITIAL_ELO
 
-# ==========================================================
-# FUNGSI UTILITAS (Tidak Berubah)
-# ==========================================================
 def pretty_league_name(file_name):
-    # ... (kode Anda tidak berubah) ...
     name = file_name.replace('dataset_', '').replace('.csv', '')
     name = name.replace('_1', '')
     special_cases = { 'seriea': 'Serie A', 'laliga': 'La Liga', 'premierleague': 'Premier League', 'bundesliga': 'Bundesliga', 'ligue1': 'Ligue 1' }
@@ -32,7 +26,6 @@ def pretty_league_name(file_name):
     return special_cases.get(key, name.replace('_', ' ').title())
 
 def file_name_from_pretty(league_display):
-    # ... (kode Anda tidak berubah) ...
     league_lower = league_display.lower().replace(' ', '')
     files = glob.glob(os.path.join(DATASET_DIR, '*.csv'))
     for f in files:
@@ -42,13 +35,11 @@ def file_name_from_pretty(league_display):
     return league_lower
 
 def list_leagues():
-    # ... (kode Anda tidak berubah) ...
     files = glob.glob(os.path.join(DATASET_DIR, '*.csv'))
     league_names = sorted([pretty_league_name(os.path.splitext(os.path.basename(p))[0]) for p in files])
     return [ALL_LEAGUES] + league_names
 
 def load_league_dataset_by_name(league_display):
-    # ... (kode Anda tidak berubah) ...
     league_lower = league_display.lower().replace(' ', '')
     files = glob.glob(os.path.join(DATASET_DIR, '*.csv'))
     matched_file = None
@@ -67,7 +58,6 @@ def load_league_dataset_by_name(league_display):
 
 @functools.lru_cache(maxsize=128)
 def find_team_league_and_df(team_name):
-    # ... (kode Anda tidak berubah) ...
     all_league_names = [lg for lg in list_leagues() if lg != ALL_LEAGUES]
     for league_name in all_league_names:
         try:
@@ -79,7 +69,6 @@ def find_team_league_and_df(team_name):
     return None, None
 
 def h2h_stats_all_leagues(home_team, away_team, window=5):
-    # ... (kode Anda tidak berubah) ...
     all_matches = []
     files = glob.glob(os.path.join(DATASET_DIR, '*.csv'))
     for f in files:
@@ -112,7 +101,6 @@ def h2h_stats_all_leagues(home_team, away_team, window=5):
     return {'HTH_HomeWins':hth_home_wins,'HTH_AwayWins':hth_away_wins,'HTH_Draws':hth_draws, 'HTH_AvgHomeGoals':avg_home_goals,'HTH_AvgAwayGoals':avg_away_goals}
 
 def compute_features_all_leagues(home_team, away_team, window=5):
-    # ... (kode Anda tidak berubah) ...
     df_home, _ = find_team_league_and_df(home_team)
     df_away, _ = find_team_league_and_df(away_team)
     if df_home is None: raise FileNotFoundError(f"Data tim {home_team} tidak ditemukan.")
@@ -134,13 +122,6 @@ def compute_features_all_leagues(home_team, away_team, window=5):
     hth=h2h_stats_all_leagues(home_team, away_team, window)
     return {'AvgH':'','AvgD':'','AvgA':'','Avg>2.5':'','Avg<2.5':'','HomeTeamElo':last_home_elo,'AwayTeamElo':last_away_elo,'EloDifference':last_home_elo-last_away_elo,'Home_AvgGoalsScored':home_stats['AvgGoalsScored'],'Home_AvgGoalsConceded':home_stats['AvgGoalsConceded'],'Home_Wins':home_stats['Wins'],'Home_Draws':home_stats['Draws'],'Home_Losses':home_stats['Losses'],'Away_AvgGoalsScored':away_stats['AvgGoalsScored'],'Away_AvgGoalsConceded':away_stats['AvgGoalsConceded'],'Away_Wins':away_stats['Wins'],'Away_Draws':away_stats['Draws'],'Away_Losses':away_stats['Losses'],'HTH_HomeWins':hth['HTH_HomeWins'],'HTH_AwayWins':hth['HTH_AwayWins'],'HTH_Draws':hth['HTH_Draws'],'HTH_AvgHomeGoals':hth['HTH_AvgHomeGoals'],'HTH_AvgAwayGoals':hth['HTH_AvgAwayGoals']}
 
-
-# ==========================================================
-# FUNGSI RIWAYAT PREDIKSI (DIPERBARUI)
-# ==========================================================
-
-# ▼▼▼ PERBARUI FUNGSI INI ▼▼▼
-# Tambahkan parameter 'input_features'
 def add_prediction_to_history(user, prediction_dict, input_features=None):
     if not user.is_authenticated:
         return None 
@@ -153,22 +134,15 @@ def add_prediction_to_history(user, prediction_dict, input_features=None):
             prediction_data=prediction_dict.get('prediction'),
             input_features= input_features
         )
-        return new_history  # <<< KEMBALIKAN OBJEK YANG BARU DIBUAT
+        return new_history 
     except Exception as e:
         print(f"Gagal menyimpan riwayat ke DB: {e}")
         return None
-# ▲▲▲ AKHIR PERUBAHAN ▲▲▲
-
-# ==========================================================
-# FUNGSI HITUNG STATISTIK (Tidak Berubah)
-# ==========================================================
 
 def expected_score(rating_a, rating_b):
-    # ... (kode Anda tidak berubah) ...
     return 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
 
 def recent_stats_for_team(df, team, window=5):
-    # ... (kode Anda tidak berubah) ...
     mask = (df['HomeTeam'] == team) | (df['AwayTeam'] == team)
     team_games = df[mask].sort_values('Date', ascending=False) if 'Date' in df.columns else df[mask]
     if team_games.empty: return {'AvgGoalsScored': 0, 'AvgGoalsConceded': 0, 'Wins': 0, 'Draws': 0, 'Losses': 0}
@@ -184,7 +158,6 @@ def recent_stats_for_team(df, team, window=5):
     return {'AvgGoalsScored': float(scored.mean()),'AvgGoalsConceded': float(conceded.mean()),'Wins': int((res=='W').sum()),'Draws': int((res=='D').sum()),'Losses': int((res=='L').sum())}
 
 def h2h_stats(df, home_team, away_team, window=5):
-    # ... (kode Anda tidak berubah) ...
     mask = ((df['HomeTeam']==home_team)&(df['AwayTeam']==away_team)) | ((df['HomeTeam']==away_team)&(df['AwayTeam']==home_team))
     hth = df[mask].sort_values('Date', ascending=False).head(window)
     hth_home_wins=hth_away_wins=hth_draws=0
@@ -201,7 +174,6 @@ def h2h_stats(df, home_team, away_team, window=5):
     return {'HTH_HomeWins':hth_home_wins,'HTH_AwayWins':hth_away_wins,'HTH_Draws':hth_draws, 'HTH_AvgHomeGoals':avg_home_goals,'HTH_AvgAwayGoals':avg_away_goals}
 
 def compute_features_from_dataset(df, home_team, away_team, window=5):
-    # ... (kode Anda tidak berubah) ...
     last_home_elo=last_away_elo=INITIAL_ELO
     if 'HomeTeamElo' in df.columns and 'AwayTeamElo' in df.columns:
         tmp_h=df[(df['HomeTeam']==home_team)|(df['AwayTeam']==home_team)]
@@ -218,7 +190,6 @@ def compute_features_from_dataset(df, home_team, away_team, window=5):
     return {'AvgH':'','AvgD':'','AvgA':'','Avg>2.5':'','Avg<2.5':'','HomeTeamElo':last_home_elo,'AwayTeamElo':last_away_elo,'EloDifference':last_home_elo-last_away_elo,'Home_AvgGoalsScored':home_stats['AvgGoalsScored'],'Home_AvgGoalsConceded':home_stats['AvgGoalsConceded'],'Home_Wins':home_stats['Wins'],'Home_Draws':home_stats['Draws'],'Home_Losses':home_stats['Losses'],'Away_AvgGoalsScored':away_stats['AvgGoalsScored'],'Away_AvgGoalsConceded':away_stats['AvgGoalsConceded'],'Away_Wins':away_stats['Wins'],'Away_Draws':away_stats['Draws'],'Away_Losses':away_stats['Losses'],'HTH_HomeWins':hth['HTH_HomeWins'],'HTH_AwayWins':hth['HTH_AwayWins'],'HTH_Draws':hth['HTH_Draws'],'HTH_AvgHomeGoals':hth['HTH_AvgHomeGoals'],'HTH_AvgAwayGoals':hth['HTH_AvgAwayGoals']}
 
 def format_float_clean(number):
-    # ... (kode Anda tidak berubah) ...
     if number is None or pd.isna(number) or str(number).strip() == '': return ""
     try:
         rounded_num = round(float(number), 2)
@@ -226,7 +197,6 @@ def format_float_clean(number):
     except (ValueError, TypeError): return str(number)
 
 def update_elo_and_features(df_existing, df_new, window=5, K=30, initial_elo=INITIAL_ELO):
-    # ... (kode Anda tidak berubah) ...
     if 'Date' in df_existing.columns: df_existing['Date'] = pd.to_datetime(df_existing['Date'], errors='coerce')
     if 'Date' in df_new.columns: df_new['Date'] = pd.to_datetime(df_new['Date'], errors='coerce')
     df_combined = pd.concat([df_existing, df_new], ignore_index=True).sort_values('Date').reset_index(drop=True)
@@ -288,49 +258,40 @@ def check_prediction_results(new_matches_df):
     print(f"🔄 Memulai pengecekan {len(new_matches_df)} hasil pertandingan...")
     updated_count = 0
 
-    # Pastikan kolom hasil ada (FTHG, FTAG, FTR)
     required_cols = ['HomeTeam', 'AwayTeam', 'FTR', 'FTHG', 'FTAG']
     if not all(col in new_matches_df.columns for col in required_cols):
         print("❌ Pengecekan hasil dibatalkan: DataFrame kekurangan kolom hasil (FTHG/FTAG/FTR).")
         return 0
 
-    # Loop melalui setiap pertandingan yang baru diselesaikan dari CSV
     for index, row in new_matches_df.iterrows():
         home_team = row['HomeTeam']
         away_team = row['AwayTeam']
         
-        # Tentukan hasil sebenarnya dari data CSV
         actual_ftr = row['FTR']
         actual_ou = 'Over' if (row['FTHG'] + row['FTAG']) > 2.5 else 'Under'
         actual_btts = 'Yes' if (row['FTHG'] > 0 and row['FTAG'] > 0) else 'No'
 
-        # Cari semua prediksi di database yang belum selesai untuk pertandingan ini
         pending_predictions = PredictionHistory.objects.filter(
             home_team=home_team,
             away_team=away_team,
             is_match_completed=False,
-            is_preferred_choice=True # Hanya cek jika user membuat pilihan
+            is_preferred_choice=True 
         )
-        
-        # Jika tidak ada yang menebak pertandingan ini, lanjutkan
+
         if not pending_predictions.exists():
             continue
 
-        # Update semua prediksi yang ditemukan
         for pred in pending_predictions:
-            # 1. Cek HDA
             if pred.hda_chosen == actual_ftr:
-                pred.hda_result = 'W' # Win
+                pred.hda_result = 'W' 
             elif pred.hda_chosen != 'N':
-                pred.hda_result = 'L' # Lose
-            
-            # 2. Cek O/U
+                pred.hda_result = 'L'
+
             if pred.over_under_chosen == actual_ou:
                 pred.ou_result = 'W'
             elif pred.over_under_chosen != 'N':
                 pred.ou_result = 'L'
 
-            # 3. Cek BTTS
             if pred.btts_chosen == actual_btts:
                 pred.btts_result = 'W'
             elif pred.btts_chosen != 'N':
@@ -342,3 +303,104 @@ def check_prediction_results(new_matches_df):
 
     print(f"✅ Pengecekan selesai. {updated_count} tebakan pengguna telah diperbarui.")
     return updated_count
+
+def calculate_model_performance(new_matches_df, league_name):
+    """
+    Memprediksi hasil dari data CSV baru di belakang layar,
+    memilih tebakan terbaik (highest probability), dan menghitung win rate model.
+    """
+    print(f"🤖 Memulai kalkulasi Win Rate Model untuk {league_name}...")
+    
+    # 1. Tentukan nama folder model
+    league_folder_name = league_name.lower().replace(' ', '_')
+    league_dir = os.path.join(MODEL_DIR, league_folder_name)
+
+    if not os.path.isdir(league_dir):
+        print(f"❌ Kalkulasi Win Rate Gagal: Folder model '{league_dir}' tidak ditemukan.")
+        return
+
+    try:
+        # 2. Muat semua model dan encoder
+        model_hda = joblib.load(os.path.join(league_dir, 'model_hda.pkl'))
+        model_ou25 = joblib.load(os.path.join(league_dir, 'model_ou25.pkl'))
+        model_btts = joblib.load(os.path.join(league_dir, 'model_btts.pkl'))
+        scaler = joblib.load(os.path.join(league_dir, 'scaler.pkl'))
+        le_ftr = joblib.load(os.path.join(league_dir, 'le_ftr.pkl'))
+        le_ou = joblib.load(os.path.join(league_dir, 'le_ou.pkl'))
+        le_btts = joblib.load(os.path.join(league_dir, 'le_btts.pkl'))
+    except FileNotFoundError as e:
+        print(f"❌ Kalkulasi Win Rate Gagal: File model hilang di '{league_dir}'. Error: {e}")
+        return
+
+    df = new_matches_df.copy()
+    total_matches = len(df)
+    if total_matches == 0:
+        print("ℹ️ Tidak ada pertandingan baru untuk dihitung Win Rate Model.")
+        return
+
+    # 3. Siapkan Fitur (X)
+    X = df[FEATURE_COLUMNS]
+    X_scaled = scaler.transform(X)
+
+    # 4. Tentukan Hasil Sebenarnya (y)
+    actual_ftr = df['FTR']
+    actual_ou = np.where((df['FTHG'] + df['FTAG']) > 2.5, 'Over', 'Under')
+    actual_btts = np.where((df['FTHG'] > 0) & (df['FTAG'] > 0), 'Yes', 'No')
+
+    # 5. Dapatkan Prediksi (Label) dari model
+    pred_ftr_encoded = model_hda.predict(X_scaled)
+    pred_ou_encoded = model_ou25.predict(X_scaled)
+    pred_btts_encoded = model_btts.predict(X_scaled)
+
+    hda_correct = 0
+    ou_correct = 0
+    btts_correct = 0
+    
+    # 6. Loop setiap pertandingan untuk menghitung (Hanya Akurasi Sederhana)
+    for i in range(total_matches):
+        # Cek HDA
+        if pred_ftr_encoded[i] == le_ftr.transform([actual_ftr.iloc[i]])[0]:
+            hda_correct += 1
+        # Cek O/U
+        if pred_ou_encoded[i] == le_ou.transform([actual_ou[i]])[0]:
+            ou_correct += 1
+        # Cek BTTS
+        if pred_btts_encoded[i] == le_btts.transform([actual_btts[i]])[0]:
+            btts_correct += 1
+            
+    # --- 7. (LOGIKA DIPERBARUI) Hitung Win Rate ---
+    
+    # Win rate per kategori (seperti sebelumnya)
+    hda_wr = (hda_correct / total_matches) * 100 if total_matches > 0 else 0
+    ou_wr = (ou_correct / total_matches) * 100 if total_matches > 0 else 0
+    btts_wr = (btts_correct / total_matches) * 100 if total_matches > 0 else 0
+    
+    # Win rate GABUNGAN (Logika Baru Anda)
+    best_bet_correct_combined = hda_correct + ou_correct + btts_correct
+    best_bet_total_combined = total_matches * 3 # 3 tebakan per pertandingan
+    best_bet_wr_combined = (best_bet_correct_combined / best_bet_total_combined) * 100 if best_bet_total_combined > 0 else 0
+    
+    print(f"   -> HDA Win Rate: {hda_wr:.2f}% ({hda_correct}/{total_matches})")
+    print(f"   -> O/U Win Rate: {ou_wr:.2f}% ({ou_correct}/{total_matches})")
+    print(f"   -> BTTS Win Rate: {btts_wr:.2f}% ({btts_correct}/{total_matches})")
+    print(f"   -> Best Bet (Gabungan) Win Rate: {best_bet_wr_combined:.2f}% ({best_bet_correct_combined}/{best_bet_total_combined})")
+
+    # 8. Simpan ke database
+    try:
+        SystemPerformanceStats.objects.create(
+            league_name=league_name,
+            total_matches_processed=total_matches,
+            
+            # Simpan data gabungan (Tebakan Terbaik)
+            best_bet_correct=best_bet_correct_combined,
+            best_bet_total=best_bet_total_combined,
+            best_bet_win_rate=best_bet_wr_combined,
+            
+            # Simpan data per kategori
+            hda_win_rate=hda_wr,
+            ou_win_rate=ou_wr,
+            btts_win_rate=btts_wr
+        )
+        print("✅ Statistik Win Rate Model berhasil disimpan ke database.")
+    except Exception as e:
+        print(f"❌ Gagal menyimpan Statistik Win Rate Model ke database: {e}")

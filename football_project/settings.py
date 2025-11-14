@@ -11,10 +11,8 @@ STATIC_URL = 'static/'
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # --- 1. Konfigurasi Kunci & Proyek ---
-# ▼▼▼ PASTIKAN INI ADALAH 'SECRET_KEY' (bukan 'FLASK_SECRET_KEY') ▼▼▼
 SECRET_KEY = os.environ.get('SECRET_KEY') 
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') 
-# ▲▲▲ -------------------------------------------------------- ▲▲▲
 
 # Konfigurasi dari Flask app Anda
 DATASET_DIR = os.path.join(BASE_DIR, 'dataset')
@@ -34,21 +32,21 @@ INITIAL_ELO = 1500
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
-    'prediksi-kan-1.onrender.com',  # Mengizinkan subdomain Render Anda
-    '127.0.0.1',      # Tetap izinkan localhost
+    'prediksi-kan-1.onrender.com',  
+    '127.0.0.1',    
     'localhost', 
     '.onrender.com',
-    '10.54.8.241'
-] # Sesuaikan untuk produksi (Render akan mengaturnya)
+    '10.75.23.241'
+] 
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.onrender.com',                 # Wildcard
-    'https://prediksi-kan-1.onrender.com'  # <-- TAMBAHKAN DOMAIN LENGKAP
+    'https://*.onrender.com',                 
+    'https://prediksi-kan-1.onrender.com'  
 ]
 
 
 # Application definition
 INSTALLED_APPS = [
-    'predictions.apps.PredictionsConfig', # <-- Ubah ini agar signals.py dimuat
+    'predictions.apps.PredictionsConfig', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -81,12 +79,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'football_project.urls'
 
-# ▼▼▼ 2. GANTI BLOK TEMPLATES INI ▼▼▼
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], # <-- Folder kustom Anda
-        # 'APP_DIRS': True, # HAPUS BARIS INI
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -94,17 +90,13 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            # TAMBAHKAN 'loaders' INI SECARA EKSPLISIT
             'loaders': [
-                # 1. Cari di 'DIRS' (templates/account/login.html) terlebih dahulu
                 'django.template.loaders.filesystem.Loader', 
-                # 2. BARU cari di folder aplikasi (allauth, admin, dll)
                 'django.template.loaders.app_directories.Loader', 
             ],
         },
     },
 ]
-# ▲▲▲ AKHIR PERUBAHAN BLOK ▲▲▲
 
 WSGI_APPLICATION = 'football_project.wsgi.application'
 
@@ -138,7 +130,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_ON_GET = True
 
-# ▼▼▼ AKTIFKAN KEMBALI BLOK INI ▼▼▼
+
 # Konfigurasi Provider Google
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -156,10 +148,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-# ▲▲▲ -------------------------- ▲▲▲
 
-# ... (Sisa file: Password validators, I18N, Static files, PWA, dll) ...
-# ...
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I_18N = True

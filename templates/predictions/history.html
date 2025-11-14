@@ -7,19 +7,6 @@
 
 {% block page_styles %}
   <link rel="stylesheet" href="{% static 'css/history.css' %}">
-  {# Style inline untuk bar hasil prediksi #}
-  <style>
-       #result-details { margin-top: 30px; padding: 20px; background-color: #0f172a; border: 1px solid var(--accent); border-radius: 8px; }
-       #result-details .result-title { text-align: center; font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-bottom: 15px; }
-       #result-details #main-result { text-align: center; font-size: 1.1rem; line-height: 1.7; margin-bottom: 25px; color: #e2e8f0; }
-       #result-details .prob-group { margin-bottom: 15px; }
-       #result-details .prob-group h4 { margin: 0 0 10px 0; color: #cbd5e1; font-weight: 600; font-size: 1rem; }
-       #result-details .prob-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; }
-       #result-details .prob-item span:first-child { width: 110px; color: var(--muted); flex-shrink: 0; }
-       #result-details .prob-item span:last-child { width: 50px; font-weight: 600; flex-shrink: 0; color: #e2e8f0; }
-       #result-details .prob-bar { flex-grow: 1; height: 16px; background-color: #1e293b; border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
-       #result-details .bar { height: 100%; width: 0%; border-radius: 8px; }
-  </style>
 {% endblock %}
 
 {% block content %}
@@ -232,54 +219,7 @@
 
     {{ selected_history.prediction_data|json_script:"prediction-data-json" }}
 
-    {# Script untuk mengisi bar hasil prediksi #}
-    <script>
-      // Fungsi getGradientColor, renderProbBlock, animateBars (tidak berubah)
-      function getGradientColor(percent) { let r, g, b = 0; if (percent < 50) { r = 255; g = Math.round(5.1 * percent); } else { g = 255; r = Math.round(510 - 5.1 * percent); } return `linear-gradient(90deg, rgb(${r},${g},0) 0%, rgb(${r},${g},0) ${percent}%)`;}
-      function renderProbBlock(title, probs) { if (!probs) return ''; let html = `<div class="prob-group"><h4>${title}</h4>`; for (const [label, val] of Object.entries(probs)) { const percent = (val * 100).toFixed(1); const gradient = getGradientColor(percent); html += `<div class="prob-item"><span>${label}</span><div class="prob-bar"><div class="bar" style="width:0%; background:${gradient}" data-percent="${percent}"></div></div><span>${percent}%</span></div>`; } html += `</div>`; return html; }
-      function animateBars() { document.querySelectorAll('#result-details .bar').forEach(bar => { const percent = bar.dataset.percent || '0'; setTimeout(() => { bar.style.transition = 'width 1s ease'; bar.style.width = `${percent}%`; }, 50); }); }
-
-      // ▼▼▼ Ambil data dari json_script ▼▼▼
-      const resultContainer = document.getElementById('result-details');
-      const predictionDataElement = document.getElementById('prediction-data-json');
-      let predictionDataJson = null;
-
-      if (predictionDataElement) {
-          try {
-              // Parse JSON dari textContent elemen script
-              predictionDataJson = JSON.parse(predictionDataElement.textContent);
-          } catch (e) {
-              console.error("Gagal parse data prediksi JSON dari script tag:", e);
-          }
-      }
-      // ▲▲▲ AKHIR PENGAMBILAN DATA ▲▲▲
-
-      // Render bar jika data berhasil diparse
-      if (resultContainer && predictionDataJson) {
-         const p = predictionDataJson;
-         const hdaLabel = p.HDA?.label || '-';
-         const ou25Label = p.OU25?.label || '-';
-         const bttsLabel = p.BTTS?.label || '-';
-
-         resultContainer.innerHTML = `
-            <div class="result-title">📊 Hasil Prediksi</div>
-            <div id="main-result">
-              🏠 (H/D/A): <b>${hdaLabel}</b><br>
-              ⚽ (O/U 2.5): <b>${ou25Label}</b><br>
-              🤝 (BTTS): <b>${bttsLabel}</b>
-            </div>
-            <div id="prob-bars" class="prob-section">
-              ${renderProbBlock('🏠 (Home / Draw / Away)', p.HDA?.probs)}
-              ${renderProbBlock('⚽ Over / Under 2.5', p.OU25?.probs)}
-              ${renderProbBlock('🤝 Both Team To Score', p.BTTS?.probs)}
-            </div>
-         `;
-         animateBars();
-      } else if (resultContainer) {
-          resultContainer.innerHTML = '<p style="text-align: center; color: var(--muted);">Data hasil prediksi tidak ditemukan atau tidak valid.</p>';
-      }
-
-    </script>
+<script src="{% static 'js/history.js' %}"></script>
 
   {% else %}
     {# Pesan jika tidak ada riwayat dipilih (hanya grid atas yang tampil) #}

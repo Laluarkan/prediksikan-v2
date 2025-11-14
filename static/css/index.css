@@ -14,7 +14,7 @@ h1, h2 {
     text-align: center;
     color: #fff;
 }
-/* ... (style h1, note, form-group, hidden tidak berubah) ... */
+
 h1 {
     font-size: 1.8rem;
     margin-top: 0;
@@ -47,10 +47,6 @@ h1 {
 .hidden {
     display: none !important;
 }
-
-/* ======================================================= */
-/* ====== STYLE UNTUK CHOICES.JS (KODE LAMA ANDA) ====== */
-/* ======================================================= */
 
 .choices {
     margin-bottom: 0;
@@ -125,12 +121,7 @@ h1 {
 .choices.is-disabled .choices__inner .choices__placeholder {
     color: var(--muted);
 }
-/* ======================================================= */
-/* ====== AKHIR PERBAIKAN CHOICES.JS ====== */
-/* ======================================================= */
 
-
-/* ====== STYLE BAGIAN FITUR (FEATURE SECTION) ====== */
 #feature-section {
     border-top: 1px solid rgba(255,255,255,.1);
     margin-top: 30px;
@@ -192,10 +183,7 @@ h1 {
     box-sizing: border-box; /* <<< Tambah box-sizing */
     width: 100%; /* <<< Tambah width */
 }
-/* Hapus definisi .auto-input kedua di bawah ini jika ada */
 
-
-/* Tombol Prediksi (menggunakan style .btn dari universal) */
 #PredictBtn {
     display: block;
     width: 100%;
@@ -204,8 +192,6 @@ h1 {
     font-weight: 700;
 }
 
-
-/* ====== STYLE BAGIAN HASIL (RESULT SECTION) ====== */
 #result {
     margin-top: 30px;
     padding: 20px;
@@ -295,10 +281,7 @@ h1 {
 .prob-button-container button.btn:hover {
      background-color: #0891b2; 
 }
-/* ▲▲▲ AKHIR STYLE BARU ▲▲▲ */
 
-
-/* ====== RESPONSIVE ====== */
 @media (max-width: 600px) {
     .container {
         padding: 15px; 
@@ -342,3 +325,63 @@ h1 {
         font-size: 0.85rem; /* Font .btn.small */
     }
 }
+
+ #ai-explanation-container {
+          margin-top: 25px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      #ai-explanation {
+          font-size: 0.95rem;
+          color: var(--muted); /* Warna abu-abu */
+          line-height: 1.6;
+          font-style: italic; /* Miring */
+          background-color: rgba(0,0,0,0.1); /* Latar sedikit beda */
+          padding: 12px 15px;
+          border-radius: 6px;
+          border-left: 3px solid var(--accent); /* Aksen di kiri */
+      }
+      #ai-explanation::before {
+          content: "🤖 Analisis AI: "; /* Tambah label */
+          font-style: normal; /* Label tidak miring */
+          font-weight: 600; /* Label tebal */
+          color: #cbd5e1; /* Warna label lebih terang */
+      }
+
+      /* === SPINNER LOADING ANIMASI ELEGAN === */
+#loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    padding: 25px 0;
+}
+
+.spinner {
+    width: 42px;
+    height: 42px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--accent, #06b6d4);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+#loading-spinner p {
+    color: #e5e7eb;
+    font-size: 0.95rem;
+    letter-spacing: 0.4px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Agar efek muncul halus */
+.hidden {
+    display: none !important;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+} 
+

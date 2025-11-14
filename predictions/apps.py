@@ -7,4 +7,4 @@ class PredictionsConfig(AppConfig):
     name = 'predictions'
 
     def ready(self):
-        import predictions.signals # <-- Tambahkan baris ini
+        import predictions.signals 

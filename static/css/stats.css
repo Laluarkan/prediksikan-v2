@@ -45,8 +45,6 @@
   font-size: 0.95rem; /* Samakan font size */
 }
 
-/* Style Tombol (gunakan style .btn dari universal jika mau konsisten) */
-/* Jika ingin style khusus: */
 .btn-primary {
   background-color: #00c16a; /* Warna hijau */
   border: none;

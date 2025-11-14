@@ -15,173 +15,131 @@
   border: 1px solid rgba(255,255,255,.05);
   text-align: center;
 }
-
 .hero h1 {
   margin: 0 0 8px;
   font-size: 1.8rem;
 }
-
 .hero p {
   color: var(--muted);
   margin-bottom: 10px;
 }
-
 .hero-actions {
   margin-top: 25px;
 }
 
-.hero .league-info {
-  padding: 10px 15px;
-  max-width: 500px;
-  margin: 20px auto;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
 /* ====== Tata Letak Riwayat Prediksi ====== */
+.history{
+  margin: 30px 0; /* Beri jarak vertikal */
+  padding: 0 10px; /* Samakan dengan padding lain */
+}
 #history-list {
   display: grid;
-  /* Grid 5 kolom di layar besar, menyesuaikan ke bawah di layar kecil */
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
   gap: 12px;
   margin-top: 12px;
-  margin-bottom: 20px; /* Jarak sebelum tombol */
+  margin-bottom: 20px; 
 }
-
 .history h2 {
-    margin-bottom: 15px; /* Jarak judul */
+    margin-bottom: 15px; 
     color: white;
-    text-align: center; /* Judul di tengah */
+    text-align: center; 
 }
-
-/* Style item riwayat (sekarang jadi link <a>) */
-.hist-item { /* Ganti nama class jika perlu, atau gunakan .hist-item-link seperti di history.css */
-    display: block; /* Agar link mengisi area */
-    text-decoration: none; /* Hapus garis bawah link */
+.hist-item { 
+    display: block; 
+    text-decoration: none; 
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
-    padding: 10px 12px; /* Sesuaikan padding */
+    padding: 10px 12px; 
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     transition: transform 0.2s ease, background 0.2s ease;
     overflow: hidden;
-    color: #e2e8f0; /* Warna teks default */
+    color: #e2e8f0; 
 }
-
 .hist-item:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-3px);
 }
-
-.hist-item strong { /* Liga */
+.hist-item strong { 
     display: block;
     color: var(--accent);
-    font-size: 0.9rem; /* Sedikit kecil */
+    font-size: 0.9rem; 
     margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Handle nama liga panjang */
+    text-overflow: ellipsis; 
 }
-.hist-item small { /* Waktu */
+.hist-item small { 
     color: var(--muted);
-    font-size: 0.75rem; /* Lebih kecil */
+    font-size: 0.75rem; 
 }
-.hist-item span { /* Nama tim & hasil */
+.hist-item span { 
     display: block;
     margin-top: 4px;
-    font-size: 0.8rem; /* Lebih kecil */
+    font-size: 0.8rem; 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.hist-match { /* Nama tim */
+.hist-match { 
      font-weight: 500;
 }
-.hist-preds { /* Hasil prediksi */
+.hist-preds { 
      color: var(--muted);
 }
-
-
-/* Tombol-tombol di bawah riwayat */
 .history-actions {
-    text-align: center; /* Tombol di tengah */
+    text-align: center; 
     margin-top: 15px;
 }
-
-/* Tombol Lihat Semua Riwayat (Contoh style, sesuaikan) */
+.history-actions .btn {
+    display: inline-block;
+    margin: 5px 5px;
+}
 .view-all-history {
     background: transparent;
     border: 1px solid var(--accent);
     color: var(--accent);
-    margin-right: 10px; /* Jarak dari tombol Hapus */
+    margin-right: 10px; 
 }
 .view-all-history:hover {
     background: var(--accent);
-    color: #052025; /* Teks gelap saat hover */
+    color: #052025; 
 }
-
-/* Tombol bersihkan riwayat (style tidak berubah) */
 #clear-history.btn.small {
     background: transparent;
-    border: 1px solid #ef4444; /* Warna merah */
-    color: #ef4444; /* Warna merah */
+    border: 1px solid #ef4444; 
+    color: #ef4444; 
 }
 #clear-history.btn.small:hover {
     background: #ef4444;
-    color: #fff; /* Teks putih saat hover */
+    color: #fff; 
 }
 
-
-/* Tambahan Informasi */
-.about, .how-it-works, .disclaimer{
-  background: var(--card);
-  margin: 32px auto;
-  padding: 24px;
-  border-radius: 10px;
-  max-width: 900px;
-  border: 1px solid rgba(255,255,255,.05);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+/* ▼▼▼ HAPUS/MODIFIKASI STYLE LAMA ▼▼▼ */
+.about, .how-it-works, .disclaimer {
+  background: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  max-width: 100%;
+  box-shadow: none;
 }
-
-.about h2, .how-it-works h2, .contact h2, .disclaimer h2 {
-  text-align: center;
-  color: white;
-  margin-bottom: 16px;
+.about h2, .how-it-works h2, .disclaimer h2 {
+  display: none; 
 }
-
-.about p, .how-it-works p, .contact p, .how-it-works ol, .disclaimer p {
+.about p, .how-it-works p, .how-it-works ol, .disclaimer p {
   color: #cbd5e1;
   line-height: 1.6;
-  text-align: justify;
+  text-align: left; 
+  margin-bottom: 1em;
+  padding: 0;
 }
-
 .how-it-works ol {
   margin-left: 20px;
+  margin-bottom: 1em;
 }
+/* ▲▲▲ AKHIR PERUBAHAN STYLE LAMA ▲▲▲ */
 
-.contact {
-  text-align: center;
-}
-
-.social-links {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin-top: 15px;
-}
-
-.social-links img {
-  width: 36px;
-  height: 36px;
-  filter: brightness(0) invert(1);
-  opacity: 0.85;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.social-links img:hover {
-  transform: scale(1.15);
-  opacity: 1;
-}
 
 /* Login Prompt */
 .login-prompt {
@@ -193,30 +151,26 @@
   margin: 32px auto;
   max-width: 700px;
 }
-
 .login-prompt h2 {
   color: var(--accent, #06b6d4);
   margin-top: 0;
   margin-bottom: 12px;
 }
-
 .login-prompt p {
   color: #cbd5e1;
   margin-bottom: 20px;
   line-height: 1.6;
+  text-align: center;
 }
-
 .login-prompt .btn {
   background: var(--accent);
   color: #052025;
-  /* color: white; */ /* Ini duplikat dari file Anda, saya pilih salah satu */
   padding: 12px 18px;
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
   transition: 0.2s;
 }
-
 .login-prompt .btn:hover {
   background: #0891b2;
 }
@@ -235,81 +189,24 @@
   align-items: center;
   gap: 15px;
 }
-
 .suggestion-link p {
   margin: 0;
   color: #d1e7f5;
   font-size: 0.95rem;
+  text-align: center;
 }
-
 .suggestion-link .btn.small {
   background: var(--accent);
   color: #052025;
 }
-
 .suggestion-link .btn.small:hover {
   background: #0891b2;
 }
 
-.about p.highlight-info {
-  background: rgba(15, 23, 42, 0.8);
-  border-left: 4px solid var(--accent);
-  padding: 12px 15px;
-  margin-bottom: 20px;
-  font-size: 0.95rem;
-  font-weight: 500;
-}
 
-
-/* Responsif */
-@media (max-width: 700px) {
-  .about, .how-it-works, .contact {
-    padding: 18px;
-    margin: 10px 20px;
-  }
-
-  .hero h1 {
-    font-size: 1.5rem;
-  }
-
-  .hero-actions .btn {
-    display: block;
-    margin: 8px auto;
-    text-align: center;
-    width: fit-content;
-  }
-  
-  .suggestion-link {
-    flex-direction: column;
-    gap: 10px;
-    margin: 20px 10px 10px 10px;
-  }
-}
-
-/* Responsif untuk layar kecil */
-@media (max-width: 1000px) {
-  #history-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 700px) {
-  #history-list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .login-prompt {
-    margin: 10px 10px;
-  }
-}
-
-@media (max-width: 500px) {
-  #history-list {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Win Rate Card (Pribadi) */
 .win-rate-card {
-    background: linear-gradient(145deg, #1e293b, #0f172a); /* Latar gradient gelap */
+    background: linear-gradient(145deg, #1e293b, #0f172a); 
     border: 1px solid var(--accent);
     border-radius: 10px;
     padding: 24px;
@@ -318,140 +215,300 @@
     text-align: center;
     box-shadow: 0 4px 15px rgba(6, 182, 212, 0.1);
 }
+.win-rate-card h2 { color: #fff; margin-top: 0; margin-bottom: 10px; font-size: 1.5rem; }
+.win-rate-card p { color: var(--muted); font-size: 1rem; line-height: 1.6; margin-bottom: 20px; }
+.win-rate-display { margin: 20px 0; }
+.win-rate-display .win-rate-value { font-size: 4rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.win-rate-display .win-rate-value span { font-size: 2rem; color: #9ca3af; margin-left: 2px; }
+.win-rate-display .win-rate-detail { font-size: 1.1rem; color: #fff; margin-top: 5px; }
+.win-rate-display .win-rate-detail strong { color: #f39c12; }
 
-.win-rate-card h2 {
-    color: #fff;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.5rem;
+/* Articles Section */
+.articles-section { max-width: 900px; margin: 40px auto; padding: 0 10px; }
+.articles-section h2 { text-align: center; color: white; margin-bottom: 25px; }
+.article-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.article-card { display: block; text-decoration: none; background: var(--card); border: 1px solid #334155; border-radius: 8px; overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.article-card:hover { transform: translateY(-5px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.article-card-content { padding: 20px; }
+.article-card h3 { color: var(--accent); font-size: 1.2rem; margin-top: 0; margin-bottom: 10px; }
+.article-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+.article-card-footer { font-size: 0.8rem; color: #888; }
+.article-actions { text-align: center; margin-top: 30px; }
+.article-actions .btn.small { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+.article-actions .btn.small:hover { background: var(--accent); color: #052025; }
+
+
+/* ====== STYLE BARU UNTUK PERFORMA MODEL (MARQUEE) ====== */
+.model-win-rate-card {
+  margin: 20px 0;
+  padding: 24px 0; /* Beri padding atas/bawah, hapus padding kiri/kanan */
+  background: var(--card);
+  border-top: 1px solid #334155;
+  border-bottom: 1px solid #334155;
+  border-radius: 0; /* Hapus border-radius */
+  box-shadow: none; /* Hapus box-shadow */
+  max-width: 100%; /* Buat jadi full-width */
 }
 
-.win-rate-card p {
-    color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
+.model-win-rate-card h2 {
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 10px; /* Kurangi margin */
+  font-size: 1.3rem; 
+  text-align: left;
+  padding: 0 20px; /* Samakan dengan padding .home-container */
+}
+.model-win-rate-card h2::before {
+    content: '📈';
+    display: inline-block;
+    margin-right: 10px;
+}
+.model-win-rate-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  margin-top: 15px; /* Naikkan sedikit */
+  text-align: left;
+  padding: 0 20px; /* Samakan dengan padding .home-container */
 }
 
-.win-rate-display {
-    margin: 20px 0;
+/* 1. Wrapper luar untuk menyembunyikan overflow */
+.model-stats-scroller {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    /* Efek bayangan fade di tepi */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 15px, black 95%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, black 15px, black 95%, transparent 100%);
 }
 
-.win-rate-display .win-rate-value {
-    font-size: 4rem; /* Angka besar */
-    font-weight: 700;
+/* 2. Track yang akan dianimasikan */
+.model-stats-track {
+    display: flex;
+    width: max-content; /* Buat lebar total dari semua kapsul (termasuk duplikat) */
+    animation: marquee 40s linear infinite;
+}
+
+/* 4. Style kapsul yang lebih ringkas dan rapat */
+.model-stat-capsule {
+    display: inline-flex;
+    align-items: center;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 999px;
+    padding: 4px 8px; /* Padding minimal rapat */
+    margin-right: 4px; /* Jarak antar kapsul lebih rapat */
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+    font-family: Arial, sans-serif;
+}
+
+.model-stat-capsule:hover {
+    background: #1e293b;
+}
+
+.model-stat-capsule .stat-league {
+    font-size: 0.8rem;
+    font-weight: 600;
     color: var(--accent);
+    flex-shrink: 0;
+    margin-right: 6px; /* Jarak sangat kecil dari data */
+}
+
+.model-stat-capsule .stat-data {
+    display: flex;
+    align-items: baseline;
+    gap: 4px; /* Jarak elemen dalam kapsul rapat */
+}
+
+.model-stat-capsule .stat-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
     line-height: 1;
 }
 
-.win-rate-display .win-rate-value span {
-    font-size: 2rem; /* Tanda % lebih kecil */
-    color: #9ca3af;
-    margin-left: 2px;
-}
-
-.win-rate-display .win-rate-detail {
-    font-size: 1.1rem;
-    color: #fff;
-    margin-top: 5px;
-}
-
-.win-rate-display .win-rate-detail strong {
-    color: #f39c12; /* Emas */
-}
-
-.articles-section {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 10px;
-}
-.articles-section h2 {
-    text-align: center;
-    color: white;
-    margin-bottom: 25px;
-}
-
-.article-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-}
-
-.article-card {
-    display: block;
-    text-decoration: none;
-    background: var(--card);
-    border: 1px solid #334155;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.article-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-.article-card-content {
-    padding: 20px;
-}
-
-.article-card h3 {
-    color: var(--accent);
-    font-size: 1.2rem;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.article-card p {
+.model-stat-capsule .stat-detail {
+    font-size: 0.65rem;
     color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin-bottom: 15px;
-    /* Batasi teks hanya 3 baris */
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.article-card-footer {
-    font-size: 0.8rem;
-    color: #888;
+/* Keyframe animasi marquee */
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
 }
 
-.article-actions {
-    text-align: center;
-    margin-top: 30px;
+/* ====== STYLE INFO ACCORDION ====== */
+.info-accordion {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 0 10px;
 }
-
-/* Tombol "Lihat Semua Artikel" */
-.article-actions .btn.small {
-    background: transparent;
-    border: 1px solid var(--accent);
+.info-dropdown {
+  background: var(--card);
+  border: 1px solid #334155; 
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden; 
+}
+.info-dropdown summary {
+  padding: 18px 20px;
+  font-size: 1.1rem; 
+  font-weight: 600;
+  color: #e2e8f0;
+  cursor: pointer;
+  outline: none;
+  list-style: none; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+.info-dropdown summary:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.info-dropdown summary::after {
+  content: '+';
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--accent);
+  transition: transform 0.2s ease-out;
+}
+.info-dropdown[open] summary::after {
+  transform: rotate(45deg);
+}
+.info-dropdown[open] summary {
+  border-bottom: 1px solid #334155; 
+}
+.info-content {
+  padding: 20px;
+  color: #cbd5e1;
+  line-height: 1.7;
+  text-align: left; 
+}
+.info-content .info-subheading {
     color: var(--accent);
-}
-.article-actions .btn.small:hover {
-    background: var(--accent);
-    color: #052025;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
+/* ====== RESPONSIVE ====== */
 
-/* Responsif untuk Win Rate Card */
+@media (max-width: 1000px) {
+  #history-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 700px) {
-    .win-rate-card {
-        margin: 20px 10px;
-        padding: 20px;
-    }
-    .win-rate-display .win-rate-value {
-        font-size: 3.5rem;
-    }
-    .win-rate-display .win-rate-value span {
-        font-size: 1.5rem;
-    }
-    .win-rate-display .win-rate-detail {
-        font-size: 1rem;
-    }
+  .about, .how-it-works, .contact {
+    padding: 0;
+    margin: 0;
+  }
+  .home-container {
+    padding: 10px 0; /* Hapus padding kiri/kanan agar scroller menempel */
+  }
+  .hero, .articles-section, .win-rate-card, .login-prompt, .info-accordion, .suggestion-link, .history {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .history {
+    padding-top: 25px;
+    padding-bottom: 25px;
+  }
+  .hero {
+    border-radius: 8px;
+  }
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+  .hero-actions .btn {
+    display: block;
+    margin: 8px auto;
+    text-align: center;
+    width: fit-content;
+  }
+  .suggestion-link {
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 10px 10px 10px;
+    padding: 15px;
+  }
+  .suggestion-link p {
+    font-size: 0.9rem;
+  }
+  #history-list {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0;
+    gap: 8px;
+  }
+  .hist-item {
+    padding: 8px 10px;
+  }
+  .hist-item strong { font-size: 0.85rem; }
+  .hist-item small { font-size: 0.7rem; }
+  .hist-item span { font-size: 0.75rem; }
+  .history h2, .history-actions {
+    padding: 0; 
+  }
+  .login-prompt {
+    margin: 20px 10px;
+    padding: 20px;
+  }
+  .win-rate-card {
+    margin: 20px 10px;
+    padding: 20px;
+  }
+  .win-rate-display .win-rate-value {
+    font-size: 3.5rem;
+  }
+  .win-rate-display .win-rate-value span {
+    font-size: 1.5rem;
+  }
+  .win-rate-display .win-rate-detail {
+    font-size: 1rem;
+  }
+  .info-accordion {
+    margin: 20px auto;
+    padding: 0 10px;
+  }
+  .info-dropdown summary {
+    padding: 15px;
+    font-size: 1rem;
+  }
+  .info-content {
+    padding: 15px;
+    font-size: 0.9rem;
+  }
+  .info-content .info-subheading {
+    font-size: 1.1rem;
+  }
 }
 
+@media (max-width: 500px) {
+  #history-list {
+    grid-template-columns: 1fr;
+  }
+  .article-grid {
+    grid-template-columns: 1fr;
+  }
+  .model-stats-scroller {
+    gap: 8px;
+  }
+  .model-stat-capsule {
+    padding: 4px 8px;
+  }
+  .model-stat-capsule .stat-league { font-size: 0.8rem; }
+  .model-stat-capsule .stat-value { font-size: 0.9rem; }
+  .model-stat-capsule .stat-detail { font-size: 0.7rem; }
+}

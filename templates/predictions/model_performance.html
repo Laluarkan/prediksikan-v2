@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Performa Model - Prediksi-Kan{% endblock %}
+{% block meta_description %}Lihat riwayat akurasi dan performa model prediksi kami dari minggu ke minggu untuk semua liga.{% endblock %}
+
+{% block page_styles %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/model_performance.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="home-container performance-page-container">
+  
+  <header class="hero" style="margin-bottom: 30px;">
+    <h1>📈 Riwayat Performa Model</h1>
+    <p>Ini adalah arsip lengkap dari akurasi model kami setiap kali data pertandingan baru diunggah.</p>
+  </header>
+
+  {% if grouped_stats %}
+    {% for week_label, stats_list in grouped_stats.items %}
+      <section class="week-group">
+        <h2 class="week-title">{{ week_label }}</h2>
+        
+        <div class="performance-grid">
+          {% for stat in stats_list %}
+          <div class="model-stat-item">
+            <span class="stat-league">{{ stat.league_name }}</span>
+            <span class="stat-value">{{ stat.best_bet_win_rate|floatformat:1 }}%</span>
+            <span class="stat-label">Akurasi (Gabungan)</span>
+            <span class="stat-detail">{{ stat.best_bet_correct }}/{{ stat.best_bet_total }} Tebakan</span>
+            
+                        <div class="stat-sub-details">
+              <span>HDA: {{ stat.hda_win_rate|floatformat:1 }}%</span>
+              <span>O/U: {{ stat.ou_win_rate|floatformat:1 }}%</span>
+              <span>BTTS: {{ stat.btts_win_rate|floatformat:1 }}%</span>
+            </div>
+            <p class="stat-footer-item">{{ stat.timestamp|date:"d M Y, H:i" }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  {% else %}
+    <p style="text-align: center; color: var(--muted); font-size: 1.1rem; margin-top: 40px;">
+      Belum ada data performa model yang tersimpan.
+    </p>
+    <p style="text-align: center; color: var(--muted);">
+      Silakan unggah file CSV baru di halaman Admin 'Tambah Data' untuk menghasilkan data performa pertama.
+    </p>
+  {% endif %}
+
+</div>
+{% endblock %}
