@@ -17,35 +17,13 @@
   <header class="hero">
     <h1>Selamat datang di Prediksi-Kan</h1>
     <p>Lihat prediksi terbaru, statistik tim, dan dukung pengembangan.</p>
-    <p>Data pertandingan akan di perbarui setiap akhir match mingguan tiap liga, biasanya pada hari rabu</p>   
+    <p>Data pertandingan akan di perbarui setiap akhir match mingguan tiap liga, biasanya pada hari rabu</p>
+    <h3>Lihat tampilan website versi terbaru kami <a href="https://l1prediksikan.onrender.com/">di sini</a></h3>
     <div class="hero-actions">
       <a class="btn" href="{% url 'index' %}">Prediksi Sekarang</a>
       <a class="btn sawer" href="https://saweria.co/prediksikan" target="_blank">Dukung Kami</a>
     </div>
   </header>
-
-  {% if latest_articles %}
-  <section class="articles-section">
-      <h2>Artikel & Wawasan Terbaru</h2>
-      <div class="article-grid">
-          {% for article in latest_articles %}
-          <a href="{{ article.get_absolute_url }}" class="article-card">
-              <div class="article-card-content">
-                  <h3>{{ article.title }}</h3>
-                  <p>{{ article.excerpt }}</p>
-                  <span class="article-card-footer">
-                      Oleh {{ article.author.first_name|default:article.author.email }} 
-                      - {{ article.created_on|date:"d M Y" }}
-                  </span>
-              </div>
-          </a>
-          {% endfor %}
-      </div>
-      <div class="article-actions">
-        <a href="{% url 'article_list' %}" class="btn small">Lihat Semua Artikel</a>
-      </div>
-  </section>
-  {% endif %}
 
   {% if user.is_authenticated and win_rate_stats %}
     <section class="win-rate-card">
